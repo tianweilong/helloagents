@@ -38,7 +38,7 @@
 
 ## 执行流程
 
-> 📌 规则引用: 脚本路径、存在性检查、错误恢复规则见 references/rules/tools.md
+> 📌 规则引用: 脚本路径、存在性检查、错误恢复规则见 [references/rules/tools.md](../rules/tools.md)
 
 ### 步骤1: 确定验证范围
 

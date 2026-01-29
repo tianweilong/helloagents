@@ -119,7 +119,7 @@ STAGE_ENTRY_MODE = DIRECT（~exec命令直接进入）:
 
 ### 步骤1: 确定待执行方案包
 
-> 脚本路径、存在性检查、错误恢复规则见 references/rules/tools.md
+> 脚本路径、存在性检查、错误恢复规则见 [references/rules/tools.md](../rules/tools.md)
 
 **脚本:** `list_packages.py`
 
@@ -144,7 +144,7 @@ STAGE_ENTRY_MODE = DIRECT（~exec命令直接进入）:
 
 ### 步骤2: 检查方案包类型（CRITICAL）
 
-按 G7 "方案包类型" 和 references/rules/package.md "Overview 类型方案包生命周期" 规则执行。
+按 G7 "方案包类型" 和 [references/rules/package.md](../rules/package.md) "Overview 类型方案包生命周期" 规则执行。
 
 ```yaml
 读取 CURRENT_PACKAGE/proposal.md 判断方案包类型
@@ -374,8 +374,8 @@ KB_SKIPPED 状态来源:
 
 ### 步骤14: 迁移已执行方案包至archive/
 
-> 按 references/rules/package.md "方案包生命周期管理" 中的迁移规则执行
-> 脚本路径、存在性检查、错误恢复规则见 references/rules/tools.md
+> 按 [references/rules/package.md](../rules/package.md) "方案包生命周期管理" 中的迁移规则执行
+> 脚本路径、存在性检查、错误恢复规则见 [references/rules/tools.md](../rules/tools.md)
 
 **脚本:** `migrate_package.py <package-name>`
 
@@ -463,7 +463,7 @@ KB_SKIPPED 状态来源:
 
 ### 场景: Overview类型方案包处理
 
-按 references/rules/package.md "用户选择处理 - Overview类型方案包处理" 执行。
+按 [references/rules/package.md](../rules/package.md) "用户选择处理 - Overview类型方案包处理" 执行。
 
 ### 场景: 任务执行失败
 

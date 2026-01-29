@@ -19,7 +19,7 @@
 
 ## 服务概述
 
-> 📌 规则引用: 路径基准变量定义见 references/rules/tools.md
+> 📌 规则引用: 路径基准变量定义见 [references/rules/tools.md](../rules/tools.md)
 
 ```yaml
 服务名称: 模板服务
@@ -75,7 +75,7 @@
 <script_degradation_integration>
 ## 脚本降级对接
 
-> 📌 规则引用: 脚本执行报告机制详见 references/rules/tools.md
+> 📌 规则引用: 脚本执行报告机制详见 [references/rules/tools.md](../rules/tools.md)
 
 **场景:** 脚本因模板不存在而部分完成时，AI 接手继续。
 
@@ -322,11 +322,11 @@ archive/_index.md:
 
 | 规则 | 定义位置 |
 |------|---------|
-| 路径基准变量 | references/rules/tools.md |
-| 微调模式记录 | references/services/knowledge.md |
+| 路径基准变量 | [references/rules/tools.md](../rules/tools.md) |
+| 微调模式记录 | [references/services/knowledge.md](../services/knowledge.md) |
 | 任务状态符号 | G7 |
-| CHANGELOG格式 | references/services/knowledge.md |
-| 大型项目分片 | references/rules/scaling.md |
+| CHANGELOG格式 | [references/services/knowledge.md](../services/knowledge.md) |
+| 大型项目分片 | [references/rules/scaling.md](../rules/scaling.md) |
 | 知识库完整结构 | G1 |
 | 目录/文件自动创建规则 | G1 |
 | 方案包类型 | G7 |

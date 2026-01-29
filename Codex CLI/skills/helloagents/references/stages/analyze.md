@@ -156,7 +156,7 @@ KB_SKIPPED = false: 先检查知识库 → 不足则扫描代码库
 
 ### 步骤6: 大型项目检测
 
-> 脚本路径、存在性检查、错误恢复规则见 references/rules/tools.md
+> 脚本路径、存在性检查、错误恢复规则见 [references/rules/tools.md](../rules/tools.md)
 
 **脚本调用（可选）:** `project_stats.py`（用于获取精确的项目统计数据）
 

@@ -33,7 +33,7 @@
 
 **执行时机:** 本模块被引用时首先执行知识库开关前置检查
 
-**显式调用例外:** ~init 命令调用时，由 references/functions/init.md 处理确认流程
+**显式调用例外:** ~init 命令调用时，由 [references/functions/init.md](../functions/init.md) 处理确认流程
 
 ---
 
@@ -246,12 +246,12 @@ CHANGELOG格式校验规则:
   - 决策引用: 如有技术决策，引用决策ID
 
 示例:
-  ## [1.2.0] - 2025-01-15
+  ## [X.Y.Z] - YYYY-MM-DD
 
   ### 新增
-  - **[用户模块]**: 添加用户登录功能
-    - 方案: [202501151430_user-login](archive/2025-01/202501151430_user-login/)
-    - 决策: user-login#D001(选择JWT认证)
+  - **[{模块名}]**: {变更描述}
+    - 方案: [{YYYYMMDDHHMM}_{feature}](archive/{YYYY-MM}/{YYYYMMDDHHMM}_{feature}/)
+    - 决策: {feature}#D001({决策摘要})
 ```
 
 ### 微调模式记录规则
@@ -351,7 +351,7 @@ KB_CREATE_MODE 影响:
 <large_project_scaling>
 ## 大型项目扩展性
 
-> 📌 规则引用: 详细规则见 references/rules/scaling.md
+> 📌 规则引用: 详细规则见 [references/rules/scaling.md](../rules/scaling.md)
 
 <scaling_summary>
 大型项目扩展性要点:

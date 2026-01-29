@@ -135,7 +135,7 @@ IF WORKFLOW_MODE = AUTO_PLAN:
 
 <project_scale_rules>
 
-按 references/rules/scaling.md 规则判定，影响任务拆分粒度、文档创建策略、处理批次大小。
+按 [references/rules/scaling.md](../rules/scaling.md) 规则判定，影响任务拆分粒度、文档创建策略、处理批次大小。
 
 </project_scale_rules>
 
@@ -252,7 +252,7 @@ IF WORKFLOW_MODE = AUTO_PLAN:
 
 ### 步骤5: 详细规划
 
-> 脚本路径、存在性检查、错误恢复规则见 references/rules/tools.md
+> 脚本路径、存在性检查、错误恢复规则见 [references/rules/tools.md](../rules/tools.md)
 
 **脚本调用:**
 ```yaml
@@ -296,7 +296,7 @@ IF WORKFLOW_MODE = AUTO_PLAN:
 ### 步骤6: 方案包验收
 
 > 按 G9 阶段验收标准（design）执行
-> 脚本路径、存在性检查、错误恢复规则见 references/rules/tools.md
+> 脚本路径、存在性检查、错误恢复规则见 [references/rules/tools.md](../rules/tools.md)
 
 ```yaml
 步骤:

@@ -51,7 +51,7 @@
 ### 步骤2: 需求评估与触发响应
 
 <module_loading>
-本步骤的评估规则定义在 references/stages/evaluate.md 中，
+本步骤的评估规则定义在 [references/stages/evaluate.md](../stages/evaluate.md) 中，
 包含评分维度、追问循环规则、复杂度判定逻辑等具体指导。
 </module_loading>
 
