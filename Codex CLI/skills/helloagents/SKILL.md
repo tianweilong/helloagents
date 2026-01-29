@@ -9,14 +9,14 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，并处�
 - 用户显式调用：`/helloagents` 或 `$helloagents`
 - 用户输入 HelloAGENTS 命令：`~auto` / `~plan` / `~exec` / `~help` 等
 
-- 全局硬约束与输出包装（SSOT）：项目根目录 `AGENTS.md`
+- 全局硬约束与最小输出包装（SSOT）：项目根目录 `AGENTS.md`
 - 本技能索引（SSOT）：命令索引、references 直链、脚本入口、模板入口
 
 ## 显式调用输出（快速入口）
 
 当用户通过 `/helloagents` 或 `$helloagents` 显式激活本技能时：
 
-- 按 `AGENTS.md` 的输出包装渲染
+- 默认按 `AGENTS.md` 的输出包装渲染（用户要求短答/外部工具原样输出时允许降级）
 - 状态描述：`技能已激活`
 - 中间内容建议（避免一次性列出过多选项）：
   - 直接描述需求（推荐）
@@ -54,6 +54,7 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，并处�
 
 - 状态管理： [references/rules/state.md](references/rules/state.md)
 - 工具/脚本规范： [references/rules/tools.md](references/rules/tools.md)
+- 输出与包装： [references/rules/output.md](references/rules/output.md)
 - 方案包规则： [references/rules/package.md](references/rules/package.md)
 - 大型项目扩展： [references/rules/scaling.md](references/rules/scaling.md)
 - 知识库服务： [references/services/knowledge.md](references/services/knowledge.md)
