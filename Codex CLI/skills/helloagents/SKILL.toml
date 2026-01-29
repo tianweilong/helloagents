@@ -1,6 +1,6 @@
 [interface]
 display_name = "HelloAGENTS"
-short_description = "【HelloAGENTS】显式调用入口。使用 /helloagents 或 $helloagents 激活。"
+short_description = "提供 HelloAGENTS 工作流入口与命令/模块导航；当用户显式输入 /helloagents 或 $helloagents 时使用。"
 icon_small = "./assets/icon-small-400px.svg"
 icon_large = "./assets/icon-large.svg"
 brand_color = "#6366F1"

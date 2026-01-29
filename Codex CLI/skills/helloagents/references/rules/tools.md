@@ -2,6 +2,14 @@
 
 本模块定义内部模块调用门控和脚本执行规范。
 
+
+## 目录
+- 规则概述
+- 内部模块调用门控
+- 脚本调用规范
+- Shell 规范
+- 规则引用关系
+
 ---
 
 ## 规则概述
@@ -63,7 +71,7 @@ TEMPLATE_DIR: {SKILL_ROOT}/assets/templates/  # 模板目录
 </script_call_rules>
 
 ```yaml
-标准格式: python -X utf8 "{SCRIPT_DIR}/{脚本名}.py" [<项目路径>] [<其他参数>]
+标准格式: python3 -X utf8 "{SCRIPT_DIR}/{脚本名}.py" [<项目路径>] [<其他参数>]
 路径要求: 始终使用绝对路径，双引号包裹
 项目路径: 可选参数，不指定时使用当前工作目录
 ```
@@ -93,7 +101,7 @@ AI判断流程:
 
 ```yaml
 validate_package.py:
-  用法: python -X utf8 "{SCRIPT_DIR}/validate_package.py" [--path <项目路径>] [<方案包名>]
+  用法: python3 -X utf8 "{SCRIPT_DIR}/validate_package.py" [--path <项目路径>] [<方案包名>]
   示例:
     - validate_package.py                              # 当前目录，所有方案包
     - validate_package.py --path "/path/to/project"    # 指定目录，所有方案包
@@ -101,33 +109,33 @@ validate_package.py:
     - validate_package.py --path "/project" 202501_feat  # 指定目录和方案包
 
 project_stats.py:
-  用法: python -X utf8 "{SCRIPT_DIR}/project_stats.py" [--path <项目路径>]
+  用法: python3 -X utf8 "{SCRIPT_DIR}/project_stats.py" [--path <项目路径>]
   示例:
     - project_stats.py                                 # 当前目录
     - project_stats.py --path "/path/to/project"       # 指定目录
 
 create_package.py:
-  用法: python -X utf8 "{SCRIPT_DIR}/create_package.py" <feature> [--type <implementation|overview>] [--path <项目路径>]
+  用法: python3 -X utf8 "{SCRIPT_DIR}/create_package.py" <feature> [--type <implementation|overview>] [--path <项目路径>]
   示例:
     - create_package.py add-login                      # 当前目录，implementation类型
     - create_package.py add-login --type overview      # 当前目录，overview类型
     - create_package.py add-login --path "/project"    # 指定目录
 
 list_packages.py:
-  用法: python -X utf8 "{SCRIPT_DIR}/list_packages.py" [--path <项目路径>]
+  用法: python3 -X utf8 "{SCRIPT_DIR}/list_packages.py" [--path <项目路径>]
   示例:
     - list_packages.py                                 # 当前目录
     - list_packages.py --path "/path/to/project"       # 指定目录
 
 migrate_package.py:
-  用法: python -X utf8 "{SCRIPT_DIR}/migrate_package.py" <package-name> [--status <completed|skipped|overview>] [--all] [--path <项目路径>]
+  用法: python3 -X utf8 "{SCRIPT_DIR}/migrate_package.py" <package-name> [--status <completed|skipped|overview>] [--all] [--path <项目路径>]
   示例:
     - migrate_package.py 202501201234_feature          # 迁移指定方案包
     - migrate_package.py --all --status skipped        # 迁移全部，标记为skipped
     - migrate_package.py 202501_feat --path "/project" # 指定目录
 
 upgradewiki.py:
-  用法: python -X utf8 "{SCRIPT_DIR}/upgradewiki.py" [--path <项目路径>] [--force]
+  用法: python3 -X utf8 "{SCRIPT_DIR}/upgradewiki.py" [--path <项目路径>] [--force]
   示例:
     - upgradewiki.py                                   # 当前目录，增量升级
     - upgradewiki.py --force                           # 强制重建
@@ -285,7 +293,7 @@ validate_package.py:
 
 <script_error_handling>
 脚本错误分类处理:
-1. 环境错误: 尝试python3替代，仍失败则降级
+1. 环境错误: python3 不可用时尝试 python，仍失败则降级
 2. 依赖错误: 降级为内置逻辑
 3. 路径错误: 创建目录重试或提示用户处理
 4. 运行时错误: 分析可恢复性，决定降级或暂停
@@ -294,7 +302,7 @@ validate_package.py:
 ```yaml
 错误分类与恢复策略:
   环境错误（Python未安装/版本不兼容）:
-    - 尝试使用 python3 替代 python
+    - 尝试使用 python 替代 python3
     - 仍失败则降级为内置逻辑
 
   依赖错误（模块导入失败）:
