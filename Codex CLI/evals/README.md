@@ -13,6 +13,26 @@
 3. 对照 `expected_behavior` 逐条检查。
 4. 如出现偏差：记录“输入/输出/偏差点/期望是什么/建议修复位置（文件路径）”。
 
+## 自动验证（推荐）
+
+> `evals/run.py` 不调用任何 LLM，仅做“可确定的本地事实”校验（schema/链接/脚本返回值等）。
+> 对话级行为（例如“回复是否足够简洁/是否真的没扫描目录”）仍需要人工抽样或后续接入 LLM runner 才能端到端验证。
+
+在本目录上级（`Codex CLI/`）任意位置执行：
+
+```bash
+python3 -X utf8 evals/run.py
+```
+
+常用子集：
+
+```bash
+python3 -X utf8 evals/run.py --only schema   # JSON 字段/引用文件存在性
+python3 -X utf8 evals/run.py --only lint     # references 内是否还有裸露 references/... 文本
+python3 -X utf8 evals/run.py --only docs     # 关键硬约束文本是否存在
+python3 -X utf8 evals/run.py --only scripts  # 脚本级 smoke tests（会创建临时目录）
+```
+
 ## JSON 字段说明
 
 - `skills`：期望被触发/加载的技能列表（该用例的前置条件提示）。
