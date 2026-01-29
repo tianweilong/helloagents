@@ -1,0 +1,16 @@
+{
+  "skills": ["helloagents"],
+  "query": "~init",
+  "files": [
+    "skills/helloagents/references/functions/init.md",
+    "skills/helloagents/references/services/knowledge.md",
+    "skills/helloagents/references/services/templates.md"
+  ],
+  "expected_behavior": [
+    "遵循 KB_CREATE_MODE/KB_SKIPPED 开关语义：开关关闭时不写入，并明确告知已跳过",
+    "如检测到知识库已存在或结构不匹配，应提供确认点（不会静默覆盖/重建）",
+    "创建/升级时使用模板服务与脚本入口（优先执行 scripts/，而不是把脚本内容读入上下文）",
+    "输出包含结果摘要与下一步（例如建议运行 ~validate 或说明已创建哪些文件）"
+  ]
+}
+

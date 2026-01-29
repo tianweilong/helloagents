@@ -1,0 +1,16 @@
+{
+  "skills": ["helloagents"],
+  "query": "~plan 为这个仓库增加一个“evals 校验脚本”，用于检查 references 内是否存在裸露的 references/... 文本引用（非代码块内），并给出修复建议。",
+  "files": [
+    "skills/helloagents/scripts/create_package.py",
+    "skills/helloagents/references/functions/plan.md",
+    "skills/helloagents/references/stages/design.md"
+  ],
+  "expected_behavior": [
+    "需求足够时进入方案设计，并创建一个 implementation 类型方案包（plan/ 下）",
+    "方案包应包含 proposal.md 与 tasks.md，且任务清单可执行、可验证（含验证步骤）",
+    "任务拆分粒度合理（不要把“写脚本/写测试/更新文档”混成一条不可验证任务）",
+    "输出应明确用户如何执行/验证（例如提供脚本运行方式、检查点）"
+  ]
+}
+

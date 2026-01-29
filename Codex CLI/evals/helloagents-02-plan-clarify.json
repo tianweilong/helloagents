@@ -1,0 +1,12 @@
+{
+  "skills": ["helloagents"],
+  "query": "~plan",
+  "files": ["AGENTS.md", "skills/helloagents/references/stages/evaluate.md"],
+  "expected_behavior": [
+    "识别为规划入口（AUTO_PLAN）并进入需求评估阶段",
+    "当需求信息不足时，提出不超过 5 个关键追问，并解释缺失会导致什么风险/阻断",
+    "在需求评估阶段不扫描项目目录、不读取项目代码文件",
+    "追问后等待用户补充，再重新评分/判定复杂度并说明后续流转"
+  ]
+}
+

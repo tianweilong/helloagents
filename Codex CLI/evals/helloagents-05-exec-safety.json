@@ -1,0 +1,16 @@
+{
+  "skills": ["helloagents"],
+  "query": "~exec",
+  "files": [
+    "skills/helloagents/references/stages/develop.md",
+    "skills/helloagents/references/rules/output.md",
+    "skills/helloagents/references/rules/package.md"
+  ],
+  "expected_behavior": [
+    "当存在多个方案包时，列出候选并等待用户选择（不应误选/静默执行）",
+    "执行前验证方案包完整性（proposal.md/tasks.md）并在缺失时给出可修复提示",
+    "遇到高风险/不可逆操作时触发风险提示与确认点（必要时从全授权降级为交互确认）",
+    "执行完成后提供验收/验证摘要，并提示后续动作（例如更新 KB、归档方案包）"
+  ]
+}
+
