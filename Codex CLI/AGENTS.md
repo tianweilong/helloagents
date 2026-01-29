@@ -54,9 +54,7 @@ helloagents/
 
 ### 工具与 Shell 基础规范（CRITICAL）
 
-- 文件读写优先使用 AI 内置文件工具；不可用时才降级 Shell。
-- Bash 系（macOS/Linux）：路径参数必须加双引号；避免使用 PowerShell 语法（如 `$env:`）。
-- Windows PowerShell：读写需显式 `-Encoding UTF8`；路径用双引号；不要混用 Unix 命令。
+- 工具/脚本调用门控、路径与编码、Shell 规范：见 `skills/helloagents/references/rules/tools.md`。
 
 ---
 

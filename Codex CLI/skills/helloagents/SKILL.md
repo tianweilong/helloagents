@@ -1,18 +1,20 @@
 ---
 name: HelloAGENTS
-description: 提供 HelloAGENTS 工作流入口与命令/模块导航；当用户显式输入 /helloagents 或 $helloagents 时使用。
+description: 提供 HelloAGENTS 工作流入口与命令/模块导航，并处理 ~auto/~plan/~exec/~help 等指令；当用户输入 /helloagents、$helloagents 或任何 HelloAGENTS ~命令时使用。
 ---
 
 # HelloAGENTS 技能入口
 
-本技能仅在用户显式调用时加载（`/helloagents` 或 `$helloagents`）。
+本技能在以下情况下加载：
+- 用户显式调用：`/helloagents` 或 `$helloagents`
+- 用户输入 HelloAGENTS 命令：`~auto` / `~plan` / `~exec` / `~help` 等
 
 - 全局硬约束与输出包装（SSOT）：项目根目录 `AGENTS.md`
 - 本技能索引（SSOT）：命令索引、references 直链、脚本入口、模板入口
 
 ## 显式调用输出（快速入口）
 
-当用户通过 `/helloagents` 或 `$helloagents` 调用本技能时：
+当用户通过 `/helloagents` 或 `$helloagents` 显式激活本技能时：
 
 - 按 `AGENTS.md` 的输出包装渲染
 - 状态描述：`技能已激活`

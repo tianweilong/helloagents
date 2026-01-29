@@ -355,7 +355,22 @@ validate_package.py:
 <shell_spec>
 ## Shell 规范
 
-> 📌 规则引用: Shell 语法规范、工具选择逻辑见 G1，始终生效
+```yaml
+工具选择（优先级）:
+  1. AI 内置文件工具（读写/创建目录/应用补丁等）
+  2. Shell（仅当内置工具不可用或需要执行命令时）
+
+Bash（macOS/Linux）:
+  - 路径参数必须使用双引号包裹
+  - 使用 Unix 工具链；避免 PowerShell 语法（如 $env:）
+  - 路径分隔符统一使用 "/"（不要使用 "\\\\"）
+
+Windows PowerShell:
+  - 读写需显式 -Encoding UTF8
+  - 路径参数必须使用双引号包裹
+  - 不要混用 Unix 命令
+  - 路径分隔符统一使用 "/"（不要使用 "\\\\"）
+```
 </shell_spec>
 
 ---
@@ -372,7 +387,6 @@ validate_package.py:
   - 开发实施阶段（migrate_package.py）
 
 引用:
-  - G1 Shell语法规范
   - G3 场景内容规则
   - G4 路由机制
   - references/services/templates.md（文件结构要求）
