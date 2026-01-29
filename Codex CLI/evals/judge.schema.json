@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "passed": { "type": "boolean" },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "item": { "type": "string" },
+          "pass": { "type": "boolean" },
+          "reason": { "type": "string" }
+        },
+        "required": ["item", "pass", "reason"]
+      }
+    }
+  },
+  "required": ["passed", "checks"]
+}
+

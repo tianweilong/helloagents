@@ -33,6 +33,26 @@ python3 -X utf8 evals/run.py --only docs     # 关键硬约束文本是否存在
 python3 -X utf8 evals/run.py --only scripts  # 脚本级 smoke tests（会创建临时目录）
 ```
 
+## 端到端对话自动化（需要模型）
+
+`evals/run_e2e.py` 会调用 `codex exec` 真正跑一轮对话，并用第二次 `codex exec --output-schema` 做 judge 自动打分：
+
+```bash
+python3 -X utf8 evals/run_e2e.py
+```
+
+可选参数：
+
+```bash
+python3 -X utf8 evals/run_e2e.py --pattern 'helloagents-01-*.json'
+python3 -X utf8 evals/run_e2e.py --model o3 --judge-model o3-mini
+python3 -X utf8 evals/run_e2e.py --timeout 240
+```
+
+注意：
+- 该 runner 需要你本机 `codex` 已可用且已登录（或已配置可用的模型凭据）。
+- 这会产生真实模型调用成本；建议在 CI 中只跑关键用例或做定期回归。
+
 ## JSON 字段说明
 
 - `skills`：期望被触发/加载的技能列表（该用例的前置条件提示）。
