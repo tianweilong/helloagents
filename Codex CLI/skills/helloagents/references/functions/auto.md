@@ -45,7 +45,6 @@
 ```yaml
 执行内容:
   - WORKFLOW_MODE = AUTO_FULL
-  - STAGE_ENTRY_MODE = NATURAL
 ```
 
 ### 步骤2: 需求评估与触发响应

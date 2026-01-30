@@ -5,6 +5,8 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，处理 ~
 
 # HelloAGENTS 技能入口
 
+> SSOT = Single Source of Truth（单一事实来源）。
+
 本技能在以下情况下加载：
 - 用户显式调用：`/helloagents` 或 `$helloagents`
 - 用户输入 HelloAGENTS 命令：`~auto` / `~plan` / `~exec` / `~help` 等

@@ -33,7 +33,7 @@
 设置时机: 本模块被加载时
 设置内容:
   - CURRENT_STAGE = DEVELOP
-  - STAGE_ENTRY_MODE = NATURAL（从方案设计流转）或 DIRECT（~exec命令）
+  - STAGE_ENTRY_MODE = DIRECT（~exec命令）；否则默认视为 NATURAL（从方案设计流转）
 ```
 
 ---
@@ -46,6 +46,8 @@
 
 ```yaml
 读取状态变量: WORKFLOW_MODE, STAGE_ENTRY_MODE
+缺省:
+  STAGE_ENTRY_MODE 未设置: 视为 NATURAL（从方案设计流转；详见 references/rules/state.md）
 
 # === 入口方式判定 ===
 

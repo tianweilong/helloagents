@@ -34,7 +34,7 @@
 **约束：** 为避免超时，满足以上条件时 **不要展开/读取** `evaluate.md`/`analyze.md`/`design.md` 全文；本文件已给出最小可执行流程。
 
 **执行步骤（必须按序）：**
-1. 设置状态：`WORKFLOW_MODE=AUTO_PLAN`、`STAGE_ENTRY_MODE=NATURAL`
+1. 设置状态：`WORKFLOW_MODE=AUTO_PLAN`
 2. 规范化需求（仅内部）：提炼目标/范围/约束；不输出长篇评分
 3. 直接创建方案包（必须用脚本，不要手写目录）：
    - `python3 -X utf8 "{SKILL_ROOT}/scripts/create_package.py" "<feature>" --type implementation --path .`
@@ -75,7 +75,6 @@
 ```yaml
 执行内容:
   - WORKFLOW_MODE = AUTO_PLAN
-  - STAGE_ENTRY_MODE = NATURAL
 ```
 
 ### 步骤2: 需求评估与触发响应

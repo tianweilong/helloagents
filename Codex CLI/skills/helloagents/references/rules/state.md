@@ -62,6 +62,8 @@
 
 用户输入~命令后，通过路由机制执行对应操作：
 
+> 约定：除非显式设置，`STAGE_ENTRY_MODE` 默认视为 `NATURAL`；仅 `~exec` 会设置为 `DIRECT`（从命令入口直达开发实施阶段）。
+
 | 命令 | 状态设置动作 | 命令类型 |
 |------|-------------|----------|
 | ~auto | WORKFLOW_MODE=AUTO_FULL, CURRENT_STAGE=EVALUATE | 需求评估类 |
