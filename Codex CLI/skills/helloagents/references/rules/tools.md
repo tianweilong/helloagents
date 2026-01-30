@@ -135,11 +135,17 @@ migrate_package.py:
     - migrate_package.py 202501_feat --path "/project" # 指定目录
 
 upgradewiki.py:
-  用法: python3 -X utf8 "{SCRIPT_DIR}/upgradewiki.py" [--path <项目路径>] [--force]
+  说明: 历史命名，实际用于知识库（KB）初始化/升级的文件系统操作
+  用法:
+    - python3 -X utf8 "{SCRIPT_DIR}/upgradewiki.py" --scan [--path <项目路径>]
+    - python3 -X utf8 "{SCRIPT_DIR}/upgradewiki.py" --init [--path <项目路径>]
+    - python3 -X utf8 "{SCRIPT_DIR}/upgradewiki.py" --backup [--path <项目路径>]
+    - python3 -X utf8 "{SCRIPT_DIR}/upgradewiki.py" --write <plan.json> [--path <项目路径>]
   示例:
-    - upgradewiki.py                                   # 当前目录，增量升级
-    - upgradewiki.py --force                           # 强制重建
-    - upgradewiki.py --path "/path/to/project"         # 指定目录
+    - upgradewiki.py --scan                             # 当前目录，扫描知识库结构
+    - upgradewiki.py --init --path "/path/to/project"   # 指定目录，初始化目录结构
+    - upgradewiki.py --backup                           # 当前目录，备份知识库
+    - upgradewiki.py --write plan.json                  # 当前目录，按计划写入文件
 ```
 
 ### 脚本存在性检查

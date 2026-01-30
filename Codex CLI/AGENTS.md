@@ -6,7 +6,7 @@
 
 **核心原则（最小集）**
 - **真实性基准**：代码是运行时行为的唯一客观事实；文档与代码不一致时，以代码为准并同步更新文档。
-- **渐进披露**：本文件仅保留不可变硬约束与最小导航；细节规则下沉到 `skills/helloagents/`（见 G8）。
+- **渐进披露**：本文件仅保留不可变硬约束与最小导航；细节规则下沉到 `skills/helloagents/`（SSOT）。
 - **先路由后行动**：路由判定完成前，不创建计划、不扫描项目目录、不读取项目代码文件。
 - **保守修改**：除非需求明确或属于正常流程，不做破坏性/不可逆操作。
 
@@ -28,7 +28,7 @@ BILINGUAL_COMMIT: 0  # 0=仅 OUTPUT_LANGUAGE, 1=OUTPUT_LANGUAGE + English
 
 ### 知识库（KB）与目录规则（CRITICAL）
 
-- 工作空间根目录固定为：`{项目根目录}/helloagents/`（模板与细则见 `skills/helloagents/references/services/knowledge.md`）。
+- 知识库根目录固定为：`{项目根目录}/helloagents/`（结构/模板见 `skills/helloagents/references/services/templates.md`）。
 - 禁止在项目根目录创建 `CHANGELOG.md`；只允许写入 `helloagents/CHANGELOG.md`。
 - 需要写入的目录/文件不存在时必须自动创建（除非 `KB_CREATE_MODE=0` 且规则明确允许跳过）。
 
@@ -38,7 +38,6 @@ BILINGUAL_COMMIT: 0  # 0=仅 OUTPUT_LANGUAGE, 1=OUTPUT_LANGUAGE + English
 - `KB_CREATE_MODE=1/2/3`：允许写入；其中 `2/3` 在编程任务下可自动创建/重建知识库（细则见 `skills/helloagents/references/services/knowledge.md`）。
 - `KB_SKIPPED`：本次流程是否跳过 KB 写操作的状态位；一旦设置在流程内保持不变。
   - 微调模式：始终 `KB_SKIPPED=true`（轻量级，不触发完整 KB 创建副作用）。
-  - 目录结构/模板：见 `skills/helloagents/references/services/templates.md`。
 
 ### 工具与 Shell 基础规范（CRITICAL）
 
@@ -71,100 +70,60 @@ BILINGUAL_COMMIT: 0  # 0=仅 OUTPUT_LANGUAGE, 1=OUTPUT_LANGUAGE + English
 下一步: {引导}
 ```
 
-**约束**
+约束：
 - 中间内容不得重复输出状态栏/操作栏。
 - 默认包含 `下一步:`；用户要求短答时可省略。
 
-**外部工具（放行 + 包装）**
+外部工具（放行 + 包装）：
 - 状态描述格式：`{工具类型}：{工具名称} - {工具状态}`
 - 中间内容保持工具原生核心内容，不改写其状态机。
 
-> 场景内容规则（直接回答/追问/确认/完成/警告/错误/取消）见 `skills/helloagents/references/rules/output.md`。
+> 场景内容规则见 `skills/helloagents/references/rules/output.md`。
 
 ---
 
 ## G4 | 路由架构（CRITICAL）
 
-### 三层路由
-
+三层路由：
 1) **上下文层**：判断是否延续既有任务/工具上下文。  
 2) **工具层**：识别 CLI 命令 / HelloAGENTS 命令 / 外部工具调用并放行。  
 3) **意图层**：问答型 → 直接回答；改动型 → 进入需求评估（evaluate）。
 
-### 路由前禁止行为（CRITICAL）
-
+路由前禁止行为（CRITICAL）：
 - 禁止在路由判定完成前创建计划清单（含 CLI 的 /plan）。
 - 禁止在需求评估阶段扫描项目目录或读取项目代码文件。
 
-### HelloAGENTS 命令与细则（SSOT）
-
-- 命令清单/触发条件/入口输出：见 `skills/helloagents/SKILL.md`
-- 各命令细则：`skills/helloagents/references/functions/*.md`
-- 各阶段细则：`skills/helloagents/references/stages/*.md`
-
-说明：为减少重复维护，本文件不再重复描述 `/helloagents`、`~plan` 等快速路径细则；以 Skill 内文档为准。
+细则索引（SSOT）：见 `skills/helloagents/SKILL.md`（命令索引 / 阶段索引 / 规则与服务索引 / 脚本入口 / 模板入口）。
 
 ---
 
 ## G5 | 执行模式（概述）
 
-- **微调模式**：非新项目 + 实现方式明确 + 单点修改 + 无 EHRB。  
-- **轻量迭代**：需要简单设计 + 局部影响 + 无 EHRB。  
-- **标准开发**：新项目/重大重构 或 需要完整设计 或 跨模块影响 或 涉及 EHRB。
-
-> 详细流程按需读取 `skills/helloagents/references/stages/*.md`（索引见 `skills/helloagents/SKILL.md`）。
+- **微调模式**：非新项目 + 实现方式明确 + 单点修改 + 无 EHRB（细则见 `skills/helloagents/references/stages/tweak.md`）。  
+- **轻量迭代**：需要简单设计 + 局部影响 + 无 EHRB（细则见 `skills/helloagents/references/stages/design.md`）。  
+- **标准开发**：新项目/重大重构 或 需要完整设计 或 跨模块影响 或 涉及 EHRB（细则见 `skills/helloagents/references/stages/develop.md`）。
 
 ---
 
 ## G6 | 外部工具规则（概述）
 
-- 原则：**放行 + Shell 包装**（不拦截、不改写工具状态机）。
-- 仅负责：顶部状态栏 + 底部操作栏；中间内容由工具输出决定（过滤其自带包装后保留核心内容）。
+- 原则：**放行 + Shell 包装**；仅负责 G3 的包装边界（细则见 `skills/helloagents/references/rules/tools.md`）。
 
 ---
 
 ## G7 | 通用规则（CRITICAL）
 
-### 任务状态符号（方案包 tasks.md）
-
-- `- [ ]` pending，`- [√]` completed，`- [X]` failed，`- [-]` skipped，`- [?]` uncertain
-
-### 方案包类型
-
-- `implementation`：可执行实施方案；`overview`：概述文档（归档，不进入开发实施）
-
-> 详细规则见 `skills/helloagents/references/rules/package.md`。
-
-### 状态变量与重置协议（最小要求）
-
-- 状态变量用于阶段编排（如 `WORKFLOW_MODE`、`CURRENT_STAGE`、`STAGE_ENTRY_MODE`、`CREATED_PACKAGE`、`KB_SKIPPED` 等）。
-- **任何完成/取消/不可恢复错误后**：必须执行状态重置，清理阶段变量并回到空闲（IDLE），避免跨任务污染。
-
-> 详细规则见 `skills/helloagents/references/rules/state.md`。
-
-### 遗留方案包扫描（概述）
-
-- 当进入方案设计/开发实施需要选择方案包且 `plan/` 下存在多个候选时：必须列出并请求用户选择。
-- 已完成/不可执行的方案包建议迁移到 `archive/`（规则见 `skills/helloagents/references/rules/package.md`）。
+- 任务状态符号：`- [ ]` pending，`- [√]` completed，`- [X]` failed，`- [-]` skipped，`- [?]` uncertain
+- 方案包类型：`implementation`（可执行）/ `overview`（归档，不进入开发实施）
+- 状态重置：任何完成/取消/不可恢复错误后必须清理阶段变量并回到空闲（细则见 `skills/helloagents/references/rules/state.md`）。
+- 遗留方案包：当需要选择且存在多个候选时，必须列出并请求用户选择（细则见 `skills/helloagents/references/rules/package.md`）。
 
 ---
 
 ## G8 | 模块加载（CRITICAL）
 
-### SKILL_ROOT 解析（仅在需要加载模块时）
-
-**评估阶段门控（CRITICAL）**
-
-- 在 `CURRENT_STAGE=EVALUATE`（需求评估阶段）且你准备**停留在评估阶段**（输出追问并等待用户补充）时：**禁止**进行任何 `SKILL_ROOT` 探测/解析与模块加载；不得通过 `ls`/`find`/`rg --files` 等方式检查目录结构。
-- 当你决定从评估阶段继续流转到后续阶段（例如 `~plan <需求描述>` 的快速路径）时：允许按需读取 `SKILL_ROOT/references/**` 与运行 `SKILL_ROOT/scripts/**`，但仍需遵守“不扫描用户项目目录/不读用户项目代码文件”的硬约束（直到进入 ANALYZE 阶段再获取项目上下文）。
-
-`SKILL_ROOT` 定义与定位：
-
-- **定义**：`SKILL_ROOT` = 当前被触发/加载的 HelloAGENTS Skill 根目录（包含 `SKILL.md` 的目录；**使用绝对路径**）。
-- **定位**：使用已加载 Skill 的文件路径推导；不要通过 Shell 扫描/探测目录来“找 SKILL_ROOT”（尤其在 EVALUATE 阶段会被判定为“扫描目录”）。
-
-### 按需读取索引（SSOT）
-本文件只保留不可变硬约束；按需读取的模块索引集中维护在 `{SKILL_ROOT}/SKILL.md`（安装态）或本仓库的 `skills/helloagents/SKILL.md`（开发态），避免多处重复导致漂移。
+- `SKILL_ROOT` = 当前 Skill 所在目录的绝对路径（包含 `SKILL.md`）。
+- 在 `CURRENT_STAGE=EVALUATE` 且准备停留在评估阶段时，禁止通过 Shell 探测/扫描目录来“找 SKILL_ROOT”（细则见 `skills/helloagents/SKILL.md`）。
 
 ---
 

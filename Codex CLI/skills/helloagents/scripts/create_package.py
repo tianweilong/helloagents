@@ -36,6 +36,10 @@ from utils import (
 TEMPLATE_PROPOSAL = "plan/proposal.md"
 TEMPLATE_TASKS = "plan/tasks.md"
 
+# 并发/重复运行时可能产生同名目录；重试上限用于避免死循环。
+# 100 基本覆盖“同一 feature 被频繁创建”的碰撞场景；超过通常意味着目录污染或命名策略异常。
+MAX_DIR_CREATE_RETRIES = 100
+
 
 def create_package(feature: str, base_path: str = None, pkg_type: str = "implementation") -> ExecutionReport:
     """
@@ -72,7 +76,7 @@ def create_package(feature: str, base_path: str = None, pkg_type: str = "impleme
         return report
 
     # 步骤2: 并发安全的目录创建（原子操作 + 重试）
-    max_retries = 100
+    max_retries = MAX_DIR_CREATE_RETRIES
     package_path = None
     package_name = None
 

@@ -1,6 +1,6 @@
 ---
 name: HelloAGENTS
-description: 提供 HelloAGENTS 工作流入口与命令/模块导航，并处理 ~auto/~plan/~exec/~help 等指令；当用户输入 /helloagents、$helloagents 或任何 HelloAGENTS ~命令时使用。
+description: 提供 HelloAGENTS 工作流入口与命令/模块导航，处理 ~auto/~plan/~exec/~help/~init/~upgrade/~clean/~commit/~test/~review/~validate/~rollback；用于方案包/知识库(KB)/CHANGELOG 等任务，或用户输入 /helloagents、$helloagents、任意 HelloAGENTS ~命令时触发。
 ---
 
 # HelloAGENTS 技能入口
@@ -107,7 +107,11 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，并处�
 脚本位于 `SKILL_ROOT/scripts/` 目录，调用时使用 `-X utf8` 确保编码正确（优先使用 `python3`；如环境仅提供 `python`，可替换命令前缀）：
 
 ```text
-知识库工具: python3 -X utf8 "{SKILL_ROOT}/scripts/upgradewiki.py" --scan | --init | --backup | --write <plan.json>
+知识库工具（upgradewiki.py，历史命名）:
+  扫描: python3 -X utf8 "{SKILL_ROOT}/scripts/upgradewiki.py" --scan [--path <项目路径>]
+  初始化: python3 -X utf8 "{SKILL_ROOT}/scripts/upgradewiki.py" --init [--path <项目路径>]
+  备份: python3 -X utf8 "{SKILL_ROOT}/scripts/upgradewiki.py" --backup [--path <项目路径>]
+  写入: python3 -X utf8 "{SKILL_ROOT}/scripts/upgradewiki.py" --write <plan.json> [--path <项目路径>]
 知识库初始化: python3 -X utf8 "{SKILL_ROOT}/scripts/init_kb.py" [--path <项目路径>]
 方案包验证: python3 -X utf8 "{SKILL_ROOT}/scripts/validate_package.py" [<package-name>]
 方案包创建: python3 -X utf8 "{SKILL_ROOT}/scripts/create_package.py" "<feature>" [--type <implementation|overview>]

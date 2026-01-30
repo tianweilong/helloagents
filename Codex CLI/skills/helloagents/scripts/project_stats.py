@@ -204,7 +204,8 @@ def count_dependencies(project_root: Path) -> dict:
             deps["total"] += npm_deps + npm_dev_deps
             deps["details"].append(f"npm: {npm_deps} deps + {npm_dev_deps} devDeps")
         except Exception:
-            pass
+            # 依赖统计是“尽力而为”，不应因单个文件解析失败而终止整个项目统计。
+            deps["details"].append("npm: 解析失败（package.json）")
 
     # requirements.txt (pip)
     req_txt = project_root / "requirements.txt"
@@ -217,7 +218,7 @@ def count_dependencies(project_root: Path) -> dict:
             deps["total"] += pip_deps
             deps["details"].append(f"pip: {pip_deps} deps")
         except Exception:
-            pass
+            deps["details"].append("pip: 解析失败（requirements.txt）")
 
     # pyproject.toml (poetry/pip)
     pyproject = project_root / "pyproject.toml"
@@ -233,7 +234,7 @@ def count_dependencies(project_root: Path) -> dict:
                 deps["by_type"]["poetry"] = poetry_deps
                 deps["total"] += poetry_deps
         except Exception:
-            pass
+            deps["details"].append("poetry: 解析失败（pyproject.toml）")
 
     # go.mod (go)
     go_mod = project_root / "go.mod"
@@ -247,7 +248,7 @@ def count_dependencies(project_root: Path) -> dict:
             deps["total"] += go_deps
             deps["details"].append(f"go: {go_deps} deps")
         except Exception:
-            pass
+            deps["details"].append("go: 解析失败（go.mod）")
 
     # Cargo.toml (rust)
     cargo = project_root / "Cargo.toml"
@@ -261,7 +262,7 @@ def count_dependencies(project_root: Path) -> dict:
             deps["total"] += cargo_deps
             deps["details"].append(f"cargo: {cargo_deps} deps")
         except Exception:
-            pass
+            deps["details"].append("cargo: 解析失败（Cargo.toml）")
 
     return deps
 
