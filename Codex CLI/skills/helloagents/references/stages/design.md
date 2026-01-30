@@ -145,7 +145,7 @@ IF WORKFLOW_MODE = AUTO_PLAN:
 
 <project_context_analysis>
 
-**推理过程（在 thinking 中完成）:**
+**要点:**
 1. 判断是新项目还是现有项目
 2. 确定执行原则和填充深度
 
@@ -187,7 +187,7 @@ IF WORKFLOW_MODE = AUTO_PLAN:
 
 <task_complexity_analysis>
 
-**推理过程（在 thinking 中完成）:**
+**要点:**
 1. 检查是否为新项目初始化或重大功能重构
 2. 分析是否涉及架构决策或技术选型
 3. 评估是否存在多种实现路径
@@ -208,7 +208,7 @@ IF WORKFLOW_MODE = AUTO_PLAN:
 
 <solution_design_reasoning>
 
-**推理过程（在 thinking 中完成）:**
+**要点:**
 1. 理解核心问题: 明确要解决什么问题，约束条件是什么
 2. 探索技术路径: 列举所有可能的实现方式
 3. 评估可行性: 逐一分析每个路径的技术可行性
@@ -220,7 +220,7 @@ IF WORKFLOW_MODE = AUTO_PLAN:
 
 <solution_comparison>
 
-**推理过程（在 thinking 中完成）:**
+**要点:**
 1. 逐一评估每个方案的优缺点、风险、成本
 2. 横向对比各方案的关键差异
 3. 确定推荐方案及理由

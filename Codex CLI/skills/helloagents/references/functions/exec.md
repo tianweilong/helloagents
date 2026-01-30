@@ -26,7 +26,7 @@
 
 ## 执行模式适配
 
-> 📌 规则引用: 按 G4 路由架构及 G5 执行模式规则执行
+> 规则引用: 按 G4 路由架构及 G5 执行模式规则执行
 
 <mode_adaptation>
 ~exec 模式适配规则:
@@ -58,7 +58,7 @@
 - （建议）在列出候选时做“只读风险预扫描”（EHRB 关键词/语义信号），用于提前标注风险包，避免误选
 
 <package_scan_analysis>
-方案包扫描推理过程:
+方案包扫描要点:
 1. 扫描 helloagents/plan/ 目录
 2. 统计有效方案包数量
 3. 根据数量和命令参数决定选择策略
@@ -87,7 +87,7 @@
 ### 步骤3: 验证方案包完整性
 
 <package_validation_analysis>
-方案包验证推理过程:
+方案包验证要点:
 1. 检查 proposal.md 存在性和非空性
 2. 检查 tasks.md 存在性和任务项数量
 3. 判定方案包是否满足执行条件
@@ -127,7 +127,7 @@
 ### 步骤4: 检查方案包类型
 
 <package_type_analysis>
-方案包类型判定推理过程:
+方案包类型判定要点:
 1. 读取 proposal.md 内容
 2. 识别方案包类型（implementation/overview）
 3. 根据类型决定后续处理路径
@@ -165,7 +165,7 @@ overview 类型: 按"Overview 类型处理"规则执行
 
 ## Overview 类型处理
 
-> 📌 规则引用: 按 [references/rules/package.md](../rules/package.md) "Overview 类型方案包生命周期" 规则执行
+> 规则引用: 按 [references/rules/package.md](../rules/package.md) "Overview 类型方案包生命周期" 规则执行
 
 ```yaml
 检测到 overview 类型方案包时:
@@ -207,7 +207,7 @@ overview 类型: 按"Overview 类型处理"规则执行
 
 ### 场景: Overview类型方案包处理
 
-> 📌 规则引用: 按 [references/rules/package.md](../rules/package.md) "用户选择处理 - Overview类型方案包处理" 执行
+> 规则引用: 按 [references/rules/package.md](../rules/package.md) "用户选择处理 - Overview类型方案包处理" 执行
 
 ### 场景: 流程级验收完成
 

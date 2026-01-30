@@ -798,6 +798,51 @@ def _lint_skill_metadata_consistency(base: Path) -> List[CheckResult]:
     return results
 
 
+def _lint_output_wrapper_consistency(base: Path) -> List[CheckResult]:
+    """
+    避免“输出包装模板”在多处维护导致漂移：
+    - AGENTS.md（G3）是默认输出包装的 SSOT
+    - SKILL.md 内置 fallback 模板需与 AGENTS.md 保持一致（用于 AGENTS.md 不可用的环境）
+    """
+    results: List[CheckResult] = []
+
+    agents_md = _read_text(base / "AGENTS.md")
+    skill_md = _read_text(base / "skills/helloagents/SKILL.md")
+
+    def _norm_block(s: str) -> str:
+        lines = [ln.rstrip() for ln in s.strip().splitlines()]
+        return "\n".join(lines).strip()
+
+    # Extract wrapper from AGENTS.md (first fenced block containing the marker line).
+    agents_m = re.search(
+        r"```[^\n]*\n(【HelloAGENTS】- \{状态描述\}[\s\S]*?)\n```",
+        agents_md,
+    )
+    if not agents_m:
+        results.append(CheckResult("lint:output-wrapper:agents_present", False, "AGENTS.md 未找到输出包装代码块"))
+        return results
+    agents_block = _norm_block(agents_m.group(1))
+
+    # Extract fallback wrapper from SKILL.md (explicit marker + fenced block).
+    skill_m = re.search(
+        r"<!--\s*OUTPUT_WRAPPER_FALLBACK:[^>]*-->\s*```[^\n]*\n([\s\S]*?)\n```",
+        skill_md,
+    )
+    if not skill_m:
+        results.append(CheckResult("lint:output-wrapper:fallback_present", False, "SKILL.md 未找到 OUTPUT_WRAPPER_FALLBACK 代码块"))
+        return results
+    skill_block = _norm_block(skill_m.group(1))
+
+    results.append(
+        CheckResult(
+            "lint:output-wrapper:fallback_matches_agents",
+            agents_block == skill_block,
+            "SKILL.md fallback 输出包装与 AGENTS.md 不一致" if agents_block != skill_block else "",
+        )
+    )
+    return results
+
+
 def _print_step(label: str) -> float:
     print(f"  - {label} ...", flush=True)
     return time.perf_counter()
@@ -825,6 +870,7 @@ def run_local_checks(*, base: Path, only: str, pattern: str) -> int:
     if only in ("lint", "local", "all"):
         checks.extend(_lint_no_bare_references(base))
         checks.extend(_lint_skill_metadata_consistency(base))
+        checks.extend(_lint_output_wrapper_consistency(base))
 
     if only in ("docs", "local", "all"):
         checks.extend(_check_activate(base))

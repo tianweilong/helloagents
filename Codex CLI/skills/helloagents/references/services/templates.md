@@ -19,7 +19,7 @@
 
 ## 服务概述
 
-> 📌 规则引用: 路径基准变量定义见 [references/rules/tools.md](../rules/tools.md)
+> 规则引用: 路径基准变量定义见 [references/rules/tools.md](../rules/tools.md)
 
 ```yaml
 服务名称: 模板服务
@@ -37,7 +37,7 @@
 ## 模板存在性检查
 
 <validation_flow>
-模板存在性检查推理过程:
+模板存在性检查要点:
 1. 构建模板完整路径
 2. 验证模板文件是否存在
 3. 存在则读取内容继续流程
@@ -75,7 +75,7 @@
 <script_degradation_integration>
 ## 脚本降级对接
 
-> 📌 规则引用: 脚本执行报告机制详见 [references/rules/tools.md](../rules/tools.md)
+> 规则引用: 脚本执行报告机制详见 [references/rules/tools.md](../rules/tools.md)
 
 **场景:** 脚本因模板不存在而部分完成时，AI 接手继续。
 
@@ -288,7 +288,7 @@ archive/_index.md:
 
 ### 概述类型方案包（overview）
 
-> 📌 规则引用: 详细规则见 G7 "方案包类型"
+> 规则引用: 详细规则见 G7 "方案包类型"
 
 ---
 

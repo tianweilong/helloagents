@@ -79,7 +79,7 @@ TEMPLATE_DIR: "{SKILL_ROOT}/assets/templates" # 模板目录
 ### 项目路径确定规则
 
 <path_determination>
-项目路径确定推理过程:
+项目路径确定要点:
 1. 默认使用CLI当前打开的路径（cwd）
 2. 用户明确指定时使用用户指定的路径
 3. 上下文不明确时追问用户确认
@@ -224,7 +224,7 @@ upgradewiki.py:
 **AI 降级接手流程:**
 
 <ai_takeover_flow>
-AI降级接手推理过程:
+AI降级接手要点:
 1. 解析脚本输出的 JSON 执行报告
 2. 识别 success=false 表示需要接手
 3. 质量检查 completed 中已完成的步骤

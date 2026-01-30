@@ -29,6 +29,23 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，处理 ~
 
 后续输入：按 `AGENTS.md` 的 G4 路由架构处理。
 
+### 内置输出包装（fallback）
+
+`AGENTS.md` 通常由项目侧提供并作为全局硬约束加载；显式激活阶段不通过 Shell 读取文件。
+若当前环境未加载/不存在 `AGENTS.md`，则使用以下等价模板：
+
+<!-- OUTPUT_WRAPPER_FALLBACK: SSOT=AGENTS.md:G3 -->
+```text
+【HelloAGENTS】- {状态描述}
+
+{中间内容}
+
+────
+文件变更: ...   ← 可选
+遗留方案包: ... ← 可选
+下一步: {引导}
+```
+
 ## 命令索引（SSOT）
 
 | 命令 | 类型 | 说明 | 细则 |
@@ -95,8 +112,12 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，处理 ~
 
 ## 运行与依赖
 
-- **依赖**: Python 3（仅标准库），无需第三方包。
+- **依赖**: Python 3（仅标准库）；git（仅 `~commit` 需要）。
 - **路径基准**: `SKILL_ROOT` = 当前 Skill 所在目录的**绝对路径**（即包含本 `SKILL.md` 的目录）。不要假设 `skills/helloagents/` 这样的相对路径一定存在；避免在运行时通过 Shell 探测/切换 CWD 版本（尤其在 EVALUATE 阶段会被视为“扫描目录”）。
+
+## 元数据一致性（SSOT）
+
+- `SKILL.md` YAML frontmatter 的 `description` 与 `SKILL.toml` 的 `short_description` 必须一致；本仓库通过 `python3 evals/run_e2e.py --only local` 自动校验，避免“双源漂移”。
 
 ## 脚本入口（执行优先）
 
