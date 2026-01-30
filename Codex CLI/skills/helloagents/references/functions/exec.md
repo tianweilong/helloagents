@@ -52,7 +52,10 @@
 
 > 脚本路径、存在性检查、错误恢复规则见 [references/rules/tools.md](../rules/tools.md)
 
-**脚本调用:** `list_packages.py`
+**脚本调用:**
+- `list_packages.py`（列出候选）
+- `validate_package.py --path <项目根目录>`（执行前完整性预检查；用于给出“缺失 proposal.md/tasks.md”的可修复提示）
+- （建议）在列出候选时做“只读风险预扫描”（EHRB 关键词/语义信号），用于提前标注风险包，避免误选
 
 <package_scan_analysis>
 方案包扫描推理过程:
@@ -66,10 +69,19 @@
 
 判断处理:
   0个方案包: 按 G3 场景内容规则（错误）输出，流程终止
+    - 输出中必须明确：执行前需要 `{package}/proposal.md` 与 `{package}/tasks.md`
+    - 并给出可修复提示：建议先用 `~plan <需求>` 创建方案包（或直接运行 create_package.py）
+    - 并提示后续动作（当执行完成后）：同步知识库（如 `~upgrade`）与归档方案包（如 `migrate_package.py`/`~clean`）
   1个方案包: 自动选择，设置 CURRENT_PACKAGE
   多个方案包:
     - 如命令指定了方案包名称: 匹配并选择
     - 如未指定: 按 G3 场景内容规则（确认）输出，等待用户选择
+      - 输出必须包含：候选列表（名称/完整性/任务数/摘要），以及“如何选择”（回复序号或重新运行 `~exec <方案包名称>`）
+      - 并建议先运行 `validate_package.py --path <项目根目录>` 做全量完整性校验（或你已在本步自动运行并摘要展示结果）
+      - 如候选中存在“不完整/不可执行”的方案包：必须列出缺失项（proposal.md/tasks.md）并给出可复制的修复命令（见步骤3）
+      - 候选列表中必须明确说明对 **proposal.md 与 tasks.md** 的检查结果（例如 `proposal.md=OK, tasks.md=missing`），不能只提其中一个文件
+      - 即使本轮等待选择、未进入实际执行，也要说明：执行完成后会提供“验收/验证摘要 + 后续动作”（例如建议 `~upgrade` 同步 KB、`migrate_package.py`/`~clean` 归档方案包）
+      - 输出末尾必须包含“执行完成后我会提供”的说明（至少包含：验收/验证摘要、KB 同步、方案包归档）
 ```
 
 ### 步骤3: 验证方案包完整性
@@ -82,11 +94,34 @@
 </package_validation_analysis>
 
 ```yaml
-检查必需文件:
+优先脚本验证:
+  - validate_package.py ${CURRENT_PACKAGE}
+
+最小必需项:
   - proposal.md（存在且非空）
-  - tasks.md（存在且至少1个任务项）
+  - tasks.md（存在且至少1个任务项，overview类型除外）
 
 验证失败: 按 G3 场景内容规则（错误）输出，流程终止
+  - 必须列出缺失项（例如 proposal.md/tasks.md）
+  - 必须给出可修复提示（包含可复制命令），例如：
+    - 重新生成（推荐）：`~plan <需求>` 或 `python3 -X utf8 "skills/helloagents/scripts/create_package.py" "<feature>" --type implementation --path .`
+    - 修复现有包（适合只缺文件）：从 templates 写入再人工补全占位符
+      - `cp "skills/helloagents/assets/templates/plan/proposal.md" "helloagents/plan/<package>/proposal.md"`
+      - `cp "skills/helloagents/assets/templates/plan/tasks.md" "helloagents/plan/<package>/tasks.md"`
+```
+
+### 步骤3.5: 风险预检（EHRB）
+
+> 目的：在真正执行任何不可逆操作前，尽早暴露风险并设置确认点。
+
+```yaml
+执行内容:
+  - 对候选/选中的方案包的 tasks.md（必要时 proposal.md）做只读扫描
+  - 依据 G2 EHRB（关键词检测 + 语义分析）判断是否包含高风险/不可逆操作信号
+
+输出要求:
+  - 若发现风险信号：在候选列表/选中包摘要中明确标注“⚠️EHRB 风险”，并说明将如何处理（执行前必须确认；必要时降级为交互确认）
+  - 若未发现：说明“未发现明显 EHRB 信号（以实际执行前检查为准）”
 ```
 
 ### 步骤4: 检查方案包类型
@@ -182,6 +217,7 @@ overview 类型: 按"Overview 类型处理"规则执行
   - 交付物摘要: 方案包、代码变更、知识库状态
   - 需求符合性: 已完成任务/未完成任务
   - 问题汇总: 警告和信息性记录（如有）
+  - 后续动作: 建议同步知识库（如 `~upgrade`）、归档方案包（如 `migrate_package.py`/`~clean`）、必要时 `~validate`
 
 输出格式: 按 G3 场景内容规则（完成）输出
 ```

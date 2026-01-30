@@ -154,8 +154,8 @@ BILINGUAL_COMMIT: 0  # 0=仅 OUTPUT_LANGUAGE, 1=OUTPUT_LANGUAGE + English
 
 当需要读取 `SKILL_ROOT/references/...`（通常位于 `skills/helloagents/references/...`）时，按以下顺序确定 `SKILL_ROOT`：
 
-1) `{USER_HOME}/{CLI_DIR}/skills/helloagents/`  
-2) `{CWD}/skills/helloagents/`
+1) `{CWD}/skills/helloagents/`  
+2) `{USER_HOME}/{CLI_DIR}/skills/helloagents/`
 
 确定后全程复用，禁止混用不同目录版本。
 

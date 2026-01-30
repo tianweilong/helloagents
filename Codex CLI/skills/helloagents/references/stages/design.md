@@ -293,6 +293,10 @@ IF WORKFLOW_MODE = AUTO_PLAN:
 4. 填充 tasks.md 内容（任务清单）
 5. 设置 CREATED_PACKAGE 变量
 
+**约束（CRITICAL）:**
+- 在 AUTO_PLAN（~plan）下也必须“落地创建”方案包（plan/ 下目录 + proposal.md + tasks.md），不要只在输出里写文字草案。
+- 优先通过脚本 `create_package.py`/`validate_package.py` 形成可追溯证据（命令记录 + 执行报告），再补充人工说明。
+
 ### 步骤6: 方案包验收
 
 > 按 G9 阶段验收标准（design）执行

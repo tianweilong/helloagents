@@ -3,7 +3,7 @@
 本目录用于保存可重复的“输入 → 期望行为”场景，帮助在重构 `AGENTS.md` / `skills/` 后快速验证行为未漂移。
 
 说明：
-- 目前不提供内置 runner；这些 JSON 主要用于人工评测（也便于未来接入自动化）。
+- 提供一个统一的 runner：`evals/run_e2e.py`（既可跑本地确定性校验，也可跑端到端对话评测）。
 - 建议使用**新的会话/新的 Agent 实例**进行评测，避免上下文污染。
 
 ## 如何使用
@@ -15,22 +15,23 @@
 
 ## 自动验证（推荐）
 
-> `evals/run.py` 不调用任何 LLM，仅做“可确定的本地事实”校验（schema/链接/脚本返回值等）。
-> 对话级行为（例如“回复是否足够简洁/是否真的没扫描目录”）仍需要人工抽样或后续接入 LLM runner 才能端到端验证。
+`evals/run_e2e.py` 支持两类验证：
+- **本地确定性校验（无需模型）**：只验证可确定的本地事实（schema/链接/脚本返回值/关键硬约束文本等）。
+- **端到端对话自动化（需要模型）**：会调用 `codex exec` 跑一轮对话，并用第二次 `codex exec --output-schema` 做 judge 自动打分。
 
 在本目录上级（`Codex CLI/`）任意位置执行：
 
 ```bash
-python3 -X utf8 evals/run.py
+python3 -X utf8 evals/run_e2e.py --only local
 ```
 
 常用子集：
 
 ```bash
-python3 -X utf8 evals/run.py --only schema   # JSON 字段/引用文件存在性
-python3 -X utf8 evals/run.py --only lint     # references 内是否还有裸露 references/... 文本
-python3 -X utf8 evals/run.py --only docs     # 关键硬约束文本是否存在
-python3 -X utf8 evals/run.py --only scripts  # 脚本级 smoke tests（会创建临时目录）
+python3 -X utf8 evals/run_e2e.py --only schema   # JSON 字段/引用文件存在性
+python3 -X utf8 evals/run_e2e.py --only lint     # references 内是否还有裸露 references/... 文本
+python3 -X utf8 evals/run_e2e.py --only docs     # 关键硬约束文本是否存在
+python3 -X utf8 evals/run_e2e.py --only scripts  # 脚本级 smoke tests（会创建临时目录）
 ```
 
 ## 端到端对话自动化（需要模型）
@@ -41,17 +42,27 @@ python3 -X utf8 evals/run.py --only scripts  # 脚本级 smoke tests（会创建
 python3 -X utf8 evals/run_e2e.py
 ```
 
+默认配置：
+- model: `gpt-5.2`
+- model_reasoning_effort: `medium`
+- codex_home: `isolated`（临时 CODEX_HOME，复制本仓库 `skills/` + 你的 `~/.codex/config.toml/auth.json`，避免全局技能漂移）
+- exec_mode: `bypass`（使用 `--dangerously-bypass-approvals-and-sandbox`；仅用于 runner 自动复制的临时工作区，确保可写）
+
 可选参数：
 
 ```bash
 python3 -X utf8 evals/run_e2e.py --pattern 'helloagents-01-*.json'
 python3 -X utf8 evals/run_e2e.py --model o3 --judge-model o3-mini
+python3 -X utf8 evals/run_e2e.py --reasoning-effort medium
 python3 -X utf8 evals/run_e2e.py --timeout 240
+python3 -X utf8 evals/run_e2e.py --codex-home system
+python3 -X utf8 evals/run_e2e.py --exec-mode sandboxed
 ```
 
 注意：
 - 该 runner 需要你本机 `codex` 已可用且已登录（或已配置可用的模型凭据）。
 - 这会产生真实模型调用成本；建议在 CI 中只跑关键用例或做定期回归。
+- `exec_mode=bypass` 很危险（会跳过 Codex sandbox/审批）。本 runner 会先复制到临时工作区并在结束后清理，但仍建议仅在可信用例/本地环境使用。
 
 ## JSON 字段说明
 

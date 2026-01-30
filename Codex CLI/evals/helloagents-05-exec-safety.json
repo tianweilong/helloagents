@@ -1,5 +1,12 @@
 {
   "skills": ["helloagents"],
+  "setup": {
+    "plan_packages": [
+      { "feature": "e2e-safe", "type": "implementation", "variant": "complete" },
+      { "feature": "e2e-broken", "type": "implementation", "variant": "missing_tasks" },
+      { "feature": "e2e-risky", "type": "implementation", "variant": "risky" }
+    ]
+  },
   "query": "~exec",
   "files": [
     "skills/helloagents/references/stages/develop.md",
@@ -13,4 +20,3 @@
     "执行完成后提供验收/验证摘要，并提示后续动作（例如更新 KB、归档方案包）"
   ]
 }
-

@@ -18,9 +18,13 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，并处�
 
 - 默认按 `AGENTS.md` 的输出包装渲染（用户要求短答/外部工具原样输出时允许降级）
 - 状态描述：`技能已激活`
-- 中间内容建议（避免一次性列出过多选项）：
+- 约束（CRITICAL）：**只做入口引导输出**，不运行任何 Shell 命令、不扫描目录、不读取任何文件（包括 `AGENTS.md`/`skills/`/项目代码）
+- 中间内容建议（避免一次性列出过多选项；**最多 1-3 个下一步**）：
   - 直接描述需求（推荐）
-  - 常用命令：`~plan`（到方案设计）、`~exec`（执行方案包）、`~help`（完整命令）
+  - `~plan`：到方案设计
+  - `~help`：查看所有命令
+- 中间内容必须包含 1 句“降级输出”说明：当用户随后要求“只要结论/短答/不要模板”时，允许降级输出（不使用完整包装）
+- 约束：**不要**在激活输出里同时列出 `~plan`/`~exec`/`~help` 等多条命令（会被判定为“下一步过多”）
 - 下一步引导：`输入 ~help 查看所有命令，或直接描述你的需求`
 
 后续输入：按 `AGENTS.md` 的 G4 路由架构处理。
@@ -41,6 +45,29 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，并处�
 | `~validate` | 工具 | 验证知识库/方案包 | [references/functions/validate.md](references/functions/validate.md) |
 | `~rollback` | 工具 | 智能回滚 | [references/functions/rollback.md](references/functions/rollback.md) |
 | `~help` | 工具 | 显示帮助 | [references/functions/help.md](references/functions/help.md) |
+
+## 快速处理：`~plan`（无参数）
+
+当用户仅输入 `~plan`（未提供任何需求描述）时：
+
+- **直接输出追问**（≤5 个问题）+ 风险说明；不进入方案设计/不创建方案包。
+- **禁止行为（CRITICAL）**：不运行任何 Shell 命令、不读取任何文件、不扫描目录（本阶段只能基于用户输入追问）。
+- **必须说明后续流转**：用户补充后，你将重新评分 → 判定复杂度 → 在 AUTO_PLAN 下生成 implementation 方案包，并给出“如何验证/如何执行”。
+
+输出要点（示例，措辞可调整但结构保持）：
+```text
+【HelloAGENTS】- 需求评估：~plan - 追问中
+
+（一句话说明：你只输入了 ~plan，缺少需求描述，无法进入方案设计）
+
+（≤5 个关键追问）
+1) ...
+
+（风险说明：缺失会导致方案高度不确定/不推荐继续）
+
+────
+下一步: 回复以上问题；我会重新评分/判定复杂度，并生成方案包（含验证/执行命令）。
+```
 
 ## 阶段索引（SSOT）
 
@@ -65,7 +92,7 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，并处�
 ## 运行与依赖
 
 - **依赖**: Python 3（仅标准库），无需第三方包。
-- **路径基准**: `SKILL_ROOT` 指向 `helloagents` 技能根目录（例如 `skills/helloagents/` 或 `{USER_HOME}/{CLI_DIR}/skills/helloagents/`）；本文中的 `references/`、`scripts/`、`assets/` 均以 `SKILL_ROOT/` 为前缀。
+- **路径基准**: `SKILL_ROOT` = 当前 Skill 所在目录（即包含本 `SKILL.md` 的目录）。避免在运行时通过 Shell 探测/切换 CWD 版本（尤其在 EVALUATE 阶段会被视为“扫描目录”）。
 
 ## 脚本入口（执行优先）
 
@@ -77,6 +104,7 @@ description: 提供 HelloAGENTS 工作流入口与命令/模块导航，并处�
 
 ```text
 知识库工具: python3 -X utf8 "{SKILL_ROOT}/scripts/upgradewiki.py" --scan | --init | --backup | --write <plan.json>
+知识库初始化: python3 -X utf8 "{SKILL_ROOT}/scripts/init_kb.py" [--path <项目路径>]
 方案包验证: python3 -X utf8 "{SKILL_ROOT}/scripts/validate_package.py" [<package-name>]
 方案包创建: python3 -X utf8 "{SKILL_ROOT}/scripts/create_package.py" "<feature>" [--type <implementation|overview>]
 方案包迁移: python3 -X utf8 "{SKILL_ROOT}/scripts/migrate_package.py" "<package-name>" [--status <completed|skipped>] [--all]

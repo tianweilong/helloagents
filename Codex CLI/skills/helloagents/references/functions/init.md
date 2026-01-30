@@ -22,6 +22,25 @@
 
 ---
 
+## 关键输出要求（CRITICAL）
+
+- 输出中必须明确：
+  - 当前 `KB_CREATE_MODE` 值
+  - 本次是否 `KB_SKIPPED`（当 `KB_CREATE_MODE=0` 且不忽略开关时为 true，否则为 false）
+  - `helloagents/` 是否存在，以及本次是否会写入/是否已跳过（不要只用“权限/只读”代替开关语义）
+  - 开关语义一句话：`KB_CREATE_MODE=0` 时默认不写入（`KB_SKIPPED=true`，并明确“知识库已跳过”）
+  - 确认点一句话：如检测到知识库已存在或结构不匹配，必须先确认“升级/重建/取消”，不会静默覆盖/重建
+  - 模板来源一句话：本次创建/补全使用 `skills/helloagents/assets/templates/`（templates 服务）写入，默认不覆盖已存在文件
+
+**硬性要求：以上两句“语义说明”必须出现在输出中（即使当前 `KB_CREATE_MODE!=0`、即使当前未触发结构不匹配分支）。**
+
+```text
+（必须出现的两行文案示例，可等价改写但含义必须完整）
+- 开关语义：KB_CREATE_MODE=0 时默认 KB_SKIPPED=true（知识库已跳过，不写入）
+- 确认点语义：如 helloagents/ 已存在或结构不匹配，会先确认升级/重建/取消，不会静默覆盖
+- 模板来源：从 skills/helloagents/assets/templates/ 写入（默认不覆盖）
+```
+
 ## 执行模式适配
 
 > 📌 规则引用: 按 G4 路由架构及 G5 执行模式规则执行
@@ -51,13 +70,15 @@
 执行时机: 进入init流程后首先检查
 
 IF KB_CREATE_MODE = 0 (OFF):
-  按 G3 场景内容规则（确认）输出
+  设置: KB_SKIPPED = true
+  按 G3 场景内容规则（确认）输出（默认跳过写入，并明确“知识库已跳过”）
 
   用户选择处理:
-    继续执行: 继续执行下方流程
+    继续执行: 忽略开关（KB_SKIPPED=false），继续执行下方流程
     取消: 按 G7 状态重置协议执行，流程终止
 
 ELSE (开关=1/2/3):
+  设置: KB_SKIPPED = false
   直接继续执行下方流程（无需额外确认）
 ```
 
@@ -73,7 +94,8 @@ ELSE (开关=1/2/3):
 
 ```yaml
 工具使用:
-  - 文件查找: 检查 helloagents/ 目录是否存在
+  - 脚本: upgradewiki.py --scan（优先；用于判断是否存在/结构信息）
+  - 文件查找: 检查 helloagents/ 目录是否存在（兜底）
   - 文件读取: 检查知识库核心文件（核心文件定义见 references/services/knowledge.md）
 
 状态判定:
@@ -134,22 +156,24 @@ ELSE (开关=1/2/3):
 
 ### 步骤4: 创建知识库文件
 
+**执行顺序（CRITICAL）**
+1. 先直接运行脚本 `init_kb.py` 完成落盘（不要先读脚本源码）。
+2. 成功后再运行 `upgradewiki.py --scan` 或 `~validate` 做结构校验，并在输出里汇总“创建了哪些目录/文件”。
+3. 只有当脚本实际执行失败且错误明确指向“权限不足/只读/沙盒阻止”时，才提示用户在本机终端手动执行，并在输出中说明：`KB_CREATE_MODE`/`KB_SKIPPED` 语义正常，但由于环境限制未能写入。
+
 ```yaml
 目录创建规则: 按 G1 "目录/文件自动创建规则" 执行
 
-读取 references/services/templates.md 获取模板，创建:
-  根目录:
-    - helloagents/INDEX.md（知识库入口）
-    - helloagents/context.md（项目上下文）
-    - helloagents/CHANGELOG.md（变更日志）
+优先脚本入口（推荐）:
+  - init_kb.py --path <项目根目录>
+    - 行为: 创建 helloagents/ 目录结构，并从 assets/templates/ 写入最小可用的基础文件
+    - 安全: 默认不覆盖已存在文件（避免静默覆盖/重建）
+    - 约束（CRITICAL）: 在可写沙盒（workspace-write/danger-full-access）下应**直接执行脚本**完成落盘；仅当脚本执行被沙盒阻止或实际失败时，才改为提示用户在本机终端手动执行
+    - 约束（CRITICAL）: **不要**通过读取脚本源代码（sed/cat）来替代执行；本命令的优先证据应来自“脚本执行记录 + JSON 执行报告”
 
-  modules目录:
-    - helloagents/modules/_index.md（模块索引）
-    - helloagents/modules/{module}.md（每个模块）
-
-  归档目录:
-    - helloagents/archive/_index.md（归档索引）
-    - helloagents/plan/（空目录，待执行方案包）
+如需手工创建（仅脚本不可用时）:
+  - 读取 references/services/templates.md 获取模板
+  - 按模板索引逐一写入到 helloagents/（避免 cp 覆盖；先检查是否存在）
 
 大型项目处理:
   判定条件: 按 references/rules/scaling.md 规则判定
@@ -203,7 +227,7 @@ ELSE (开关=1/2/3):
 ```yaml
 内容要素:
   - 当前开关状态: KB_CREATE_MODE = 0 (OFF)
-  - 行为说明: 知识库操作已关闭，~init 将忽略开关强制执行
+  - 行为说明: 知识库写入已关闭（默认 KB_SKIPPED=true，不写入）；如选择继续则会忽略开关写入
 
 选项:
   继续执行: 忽略开关，继续初始化知识库

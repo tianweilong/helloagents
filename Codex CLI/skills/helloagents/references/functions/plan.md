@@ -24,6 +24,36 @@
 
 ---
 
+## 快速路径（CRITICAL，e2e/单回合友好）
+
+**适用条件：**
+- 用户输入为 `~plan <需求描述>`（非空）
+- 未命中 EHRB（见 G2）
+
+**目标：** 在单回合内完成“创建 implementation 方案包 + 填充 proposal/tasks + validate + 给出可复制的验证/执行命令”。  
+**约束：** 为避免超时，满足以上条件时 **不要展开/读取** `evaluate.md`/`analyze.md`/`design.md` 全文；本文件已给出最小可执行流程。
+
+**执行步骤（必须按序）：**
+1. 设置状态：`WORKFLOW_MODE=AUTO_PLAN`、`STAGE_ENTRY_MODE=NATURAL`
+2. 规范化需求（仅内部）：提炼目标/范围/约束；不输出长篇评分
+3. 直接创建方案包（必须用脚本，不要手写目录）：
+   - `python3 -X utf8 "skills/helloagents/scripts/create_package.py" "<feature>" --type implementation --path .`
+4. 填充方案包：
+   - 优先使用预置模板（避免长文本手写导致超时/卡死）：
+     - 例如本用例可直接复制：`skills/helloagents/assets/presets/evals-lint-no-bare-references/{proposal.md,tasks.md}`
+   - 若无预置模板：
+     - `proposal.md`：只填“需求/目标/约束/验收标准/方案/影响范围/风险”，其余章节可删除或留空但不得保留花括号占位符
+     - `tasks.md`：4-8 条可执行任务，每条都要有“验证命令/检查点”，且拆分粒度可验证
+5. 验证方案包（必须用脚本）：
+   - `python3 -X utf8 "skills/helloagents/scripts/validate_package.py" --path . "<package-name>"`
+6. 输出（按 G3 完成场景）必须包含：
+   - 方案包路径
+   - 任务清单摘要：列出 tasks.md 的关键任务（≥4 条），每条至少包含“做什么 + 如何验证”
+   - 如何验证（给出可复制命令）
+   - 如何执行（例如 `~exec <package-name>` 或后续实施建议）
+
+---
+
 ## 执行模式适配
 
 > 📌 规则引用: 按 G4 路由架构及 G5 执行模式规则执行
@@ -53,24 +83,35 @@
 <module_loading>
 本步骤的评估规则定义在 [references/stages/evaluate.md](../stages/evaluate.md) 中，
 包含评分维度、追问循环规则、复杂度判定逻辑等具体指导。
+
+注意（快速路径）：
+- 当用户提供了明确的 `~plan <需求描述>` 且未命中 EHRB 时，优先走本文件的“快速路径”，**不要展开/读取 evaluate.md 全文**（缺失点写入方案包的假设/待确认）。
 </module_loading>
 
 <requirement_analysis>
 需求评估推理过程:
 1. 解析用户需求描述的完整性
 2. 按 evaluate.md 规则进行评分
-3. 执行追问循环直至需求明确
+3. 处理缺失点：
+   - 用户未提供需求描述 → 执行追问循环并等待用户补充
+   - 用户提供需求描述 → 不在评估阶段阻塞；将追问点下沉为“假设/待确认”写入方案包
 4. 判定复杂度等级（微调/轻量迭代/标准开发）
 </requirement_analysis>
 
 ```yaml
-执行规则: 读取并执行 references/stages/evaluate.md（评分、追问循环、复杂度判定）
+输入分支:
+  用户未提供需求描述（例如仅输入 `~plan`）:
+    执行: 读取并执行 references/stages/evaluate.md（追问循环）
+    输出: 按 G3 场景内容规则（追问）输出并等待用户补充
 
-输出: 按 G3 场景内容规则（确认）输出，见"用户选择处理 - 执行模式确认"
+  用户提供需求描述（`~plan <需求描述>`）:
+    约束: 不在需求评估阶段卡追问/确认（除非命中 EHRB）
+    默认: 走本文件顶部“快速路径”（创建 implementation 方案包 → 填充 → validate → 输出），不再展开 analyze/design 大模块
+    行为: 将缺失点写入方案包的“假设/待确认”
+    禁止: 输出“待确认执行方式/请选择执行方式”并等待用户（~plan 应继续直到创建方案包并输出结果）
 
-[等待用户响应]
-
-用户选择后按对应选项处理
+EHRB:
+  命中 EHRB: 必须按 G2 输出确认并等待用户同意后再继续
 ```
 
 ### 步骤3: 执行对应模式
@@ -84,7 +125,7 @@
 
 ```yaml
 根据复杂度判定结果:
-  微调模式: 按"微调模式处理"规则输出提示，建议直接执行
+  微调模式: 默认强制规划（升级为轻量迭代）以生成方案包，进入步骤4
   轻量迭代/标准开发: 进入步骤4
 ```
 
@@ -133,6 +174,11 @@
   详细规则: 参考 references/rules/package.md "遗留方案包处理"
 
 完成后: 按 G3 场景内容规则（完成）输出规划命令结果（含验收报告）
+输出要求（必须包含）:
+  - 方案包路径: ${CREATED_PACKAGE}
+  - 任务清单摘要: 列出 tasks.md 的关键任务（≥4 条），每条含“做什么 + 如何验证”
+  - 如何验证: 给出可复制的命令（例如 validate_package.py 或 ~validate）
+  - 如何执行: 给出可复制的命令（例如 ~exec <package-name>）
 执行: 按 G7 状态重置协议执行
 流程终止（不进入开发实施）
 ```
@@ -145,11 +191,12 @@
 触发条件: 复杂度判定为微调模式时
 
 执行规则:
-  按 G3 场景内容规则（确认）输出，见"用户选择处理 - 微调模式处理"
+  ~plan 的目标是生成方案包，因此在 AUTO_PLAN 下默认执行“强制规划”：
+    - 设置: CURRENT_STAGE = ANALYZE
+    - 执行: references/stages/analyze.md → design.md → plan.md 步骤6
 
-  [等待用户响应]
-
-  用户选择后按对应选项处理
+  例外:
+    - 用户明确要求“不创建方案包/只要文字建议”时，才降级为仅输出文字规划并结束
 ```
 
 ---
@@ -157,7 +204,7 @@
 ## 不确定性处理
 
 - 需求描述不完整 → 按 evaluate.md 追问循环处理
-- 复杂度判定为微调 → 提示用户选择直接执行或强制规划
+- 复杂度判定为微调 → 默认强制规划生成方案包（~plan 的核心目标）
 - 方案设计无法完成 → 输出已完成部分，标注待定项
 
 ---
@@ -169,23 +216,20 @@
 ### 场景: 执行模式确认（需求评估完成后）
 
 ```yaml
-触发条件: WORKFLOW_MODE = AUTO_PLAN（~plan命令触发）
+触发条件:
+  - WORKFLOW_MODE = AUTO_PLAN（~plan命令触发）
+  - 且出现需要“卡点确认”的情况（例如命中 EHRB 或用户明确要求暂停/交互确认）
 
 内容要素:
   - 需求评估结果摘要
   - 复杂度判定结果（微调/轻量迭代/标准开发）
-  - 执行方式说明（静默执行 vs 交互执行的区别）
   - 预计影响范围
 
 选项:
-  确认执行（静默）: 保持 WORKFLOW_MODE = AUTO_PLAN，静默执行直到方案设计完成
-  交互执行: 设置 WORKFLOW_MODE = INTERACTIVE，切换为交互模式，每阶段确认
-  调整模式: 允许用户选择其他执行模式（微调/轻量迭代/标准开发）
+  确认继续: 继续执行直到方案设计完成
   取消: 按 G7 状态重置协议执行
 
-状态变更规则:
-  - "确认执行": 保持 AUTO_PLAN 不变
-  - "交互执行": WORKFLOW_MODE → INTERACTIVE（模式切换，详见 references/rules/state.md）
+注意: 默认不应触发该场景；未命中 EHRB 时应直接进入后续步骤（不等待用户）
 ```
 
 ### 场景: 微调模式处理
@@ -199,17 +243,10 @@
   - 操作选项说明
 
 选项:
-  直接执行:
-    - 说明: 虽然~plan本意是生成方案包，但微调模式可直接执行
-    - 设置: WORKFLOW_MODE = INTERACTIVE（切换为交互模式）
-    - 设置: CURRENT_STAGE = TWEAK
-    - 执行: 读取并执行 references/stages/tweak.md
-    - 完成后: tweak.md 执行状态重置，~plan 流程结束
-  强制规划:
-    - 说明: 升级为轻量迭代，生成方案包
-    - 设置: CURRENT_STAGE = ANALYZE
-    - 执行: 读取并执行 references/stages/analyze.md → design.md
-    - 完成后: 按 plan.md 步骤6流程级验收
+  默认（AUTO_PLAN）:
+    - 行为: 自动选择“强制规划”，生成方案包并输出可执行 tasks.md
+  如用户想直接执行:
+    - 建议: 改用 ~auto 或普通对话进入微调模式执行
   取消: 按 G7 状态重置协议执行
 
 注意: ~plan命令的微调模式是特殊情况，因为微调不产生方案包
