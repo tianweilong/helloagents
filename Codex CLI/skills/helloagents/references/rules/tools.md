@@ -35,14 +35,14 @@
 
 <module_identification>
 内部模块特征定义:
-1. 位于 skills/helloagents/ 目录下的 .md 文件
+1. 位于 `SKILL_ROOT/references/` 目录下的 `.md` 文件
 2. 通过 G4 路由机制触发
 3. 通过命令触发词（~auto/~plan/~exec等）触发
 4. 通过模块间相互引用触发
 </module_identification>
 
 **内部模块识别:**
-- 位于 `skills/helloagents/` 目录下的 `.md` 文件
+- 位于 `SKILL_ROOT/references/` 目录下的 `.md` 文件
 
 **调用入口:** G4 路由机制、命令触发词（~auto/~plan/~exec等）、模块间相互引用
 </module_gate>
@@ -55,9 +55,9 @@
 ### 路径基准
 
 ```yaml
-SKILL_ROOT: skills/helloagents/        # SKILL.md 所在目录
-SCRIPT_DIR: {SKILL_ROOT}/scripts/      # 脚本目录
-TEMPLATE_DIR: {SKILL_ROOT}/assets/templates/  # 模板目录
+SKILL_ROOT: "/path/to/skills/helloagents"     # 当前 Skill 根目录（包含 SKILL.md 的目录；必须为绝对路径）
+SCRIPT_DIR: "{SKILL_ROOT}/scripts"            # 脚本目录
+TEMPLATE_DIR: "{SKILL_ROOT}/assets/templates" # 模板目录
 ```
 
 ### 调用格式

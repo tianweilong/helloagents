@@ -17,9 +17,9 @@
 HelloAGENTS 的文档体系（`skills/**/references/` 等）中会出现 `references/...` 形式的路径引用。为避免出现“裸露引用”（不在 fenced code block 中、也不是 Markdown 链接目标），需要一个可重复、可自动化的 lint 检查。
 
 ### 目标
-- 新增一个 `evals` 校验脚本：扫描指定 `references/` 目录下的 Markdown，定位裸露的 `references/...` 文本引用（非代码块内）。
+- 新增/维护一个 `evals` lint 校验：扫描指定 `references/` 目录下的 Markdown，定位裸露的 `references/...` 文本引用（非代码块内）。
 - 对每个命中项输出：文件路径、行号、命中片段，并给出可执行的修复建议。
-- 该脚本可被 `evals/run_e2e.py --only lint` 调用，作为本地/CI 的快速回归点。
+- 该 lint 校验以 `evals/run_e2e.py --only lint` 为统一入口，作为本地/CI 的快速回归点。
 
 ### 约束条件
 ```yaml
@@ -29,9 +29,9 @@ HelloAGENTS 的文档体系（`skills/**/references/` 等）中会出现 `refere
 ```
 
 ### 验收标准
-- [ ] `python3 -X utf8 evals/check_no_bare_references.py --path skills/helloagents/references` 在无问题时退出码为 0
+- [ ] `python3 -X utf8 evals/run_e2e.py --only lint` 在无问题时退出码为 0
 - [ ] 出现问题时：逐条输出 `file:line: snippet`，并给出“如何改成链接/代码块”的建议，退出码为 1
-- [ ] `evals/run_e2e.py --only lint` 能调用该检查（或等价逻辑）并在失败时给出清晰定位
+- [ ] `evals/run_e2e.py --only lint` 为 lint SSOT 入口，并在失败时给出清晰定位
 - [ ] `evals/README.md` 说明如何运行该检查
 
 ---
@@ -58,4 +58,3 @@ HelloAGENTS 的文档体系（`skills/**/references/` 等）中会出现 `refere
 |------|------|------|
 | 误报（链接/代码块判断错误） | 中 | 增加忽略规则 + self-test 用例 |
 | 漏报（复杂 Markdown 结构） | 低 | 先覆盖 80% 常见场景；后续迭代完善 |
-

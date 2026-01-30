@@ -1,6 +1,4 @@
 <!-- bootstrap: lang=zh-CN; encoding=UTF-8 -->
-<!-- version: 2.0.3 -->
-<!-- HELLOAGENTS_ROUTER: v2.0.3 -->
 
 # HelloAGENTS
 
@@ -98,10 +96,13 @@ BILINGUAL_COMMIT: 0  # 0=仅 OUTPUT_LANGUAGE, 1=OUTPUT_LANGUAGE + English
 - 禁止在路由判定完成前创建计划清单（含 CLI 的 /plan）。
 - 禁止在需求评估阶段扫描项目目录或读取项目代码文件。
 
-### HelloAGENTS 命令索引
+### HelloAGENTS 命令与细则（SSOT）
 
-- 命令清单与简述：见 `skills/helloagents/SKILL.md`（命令索引）。
-- 具体命令行为：由 `skills/helloagents/SKILL.md` 直链到 `skills/helloagents/references/functions/*.md` 按需读取。
+- 命令清单/触发条件/入口输出：见 `skills/helloagents/SKILL.md`
+- 各命令细则：`skills/helloagents/references/functions/*.md`
+- 各阶段细则：`skills/helloagents/references/stages/*.md`
+
+说明：为减少重复维护，本文件不再重复描述 `/helloagents`、`~plan` 等快速路径细则；以 Skill 内文档为准。
 
 ---
 
@@ -152,19 +153,22 @@ BILINGUAL_COMMIT: 0  # 0=仅 OUTPUT_LANGUAGE, 1=OUTPUT_LANGUAGE + English
 
 ### SKILL_ROOT 解析（仅在需要加载模块时）
 
-当需要读取 `SKILL_ROOT/references/...`（通常位于 `skills/helloagents/references/...`）时，按以下顺序确定 `SKILL_ROOT`：
+**评估阶段门控（CRITICAL）**
 
-1) `{CWD}/skills/helloagents/`  
-2) `{USER_HOME}/{CLI_DIR}/skills/helloagents/`
+- 在 `CURRENT_STAGE=EVALUATE`（需求评估阶段）且你准备**停留在评估阶段**（输出追问并等待用户补充）时：**禁止**进行任何 `SKILL_ROOT` 探测/解析与模块加载；不得通过 `ls`/`find`/`rg --files` 等方式检查目录结构。
+- 当你决定从评估阶段继续流转到后续阶段（例如 `~plan <需求描述>` 的快速路径）时：允许按需读取 `SKILL_ROOT/references/**` 与运行 `SKILL_ROOT/scripts/**`，但仍需遵守“不扫描用户项目目录/不读用户项目代码文件”的硬约束（直到进入 ANALYZE 阶段再获取项目上下文）。
 
-确定后全程复用，禁止混用不同目录版本。
+`SKILL_ROOT` 定义与定位：
+
+- **定义**：`SKILL_ROOT` = 当前被触发/加载的 HelloAGENTS Skill 根目录（包含 `SKILL.md` 的目录；**使用绝对路径**）。
+- **定位**：使用已加载 Skill 的文件路径推导；不要通过 Shell 扫描/探测目录来“找 SKILL_ROOT”（尤其在 EVALUATE 阶段会被判定为“扫描目录”）。
 
 ### 按需读取索引（SSOT）
-本文件只保留不可变硬约束；按需读取的模块索引集中维护在 `skills/helloagents/SKILL.md`，避免多处重复导致漂移。
+本文件只保留不可变硬约束；按需读取的模块索引集中维护在 `{SKILL_ROOT}/SKILL.md`（安装态）或本仓库的 `skills/helloagents/SKILL.md`（开发态），避免多处重复导致漂移。
 
 ---
 
 ## G9 | 验收（概述）
 
-- 修改类任务默认需要：可运行/可验证、变更范围清晰、文档同步（KB/方案包/CHANGELOG 规则按 `skills/helloagents/references/` 执行）。
+- 修改类任务默认需要：可运行/可验证、变更范围清晰、文档同步（KB/方案包/CHANGELOG 规则按 `SKILL_ROOT/references/` 执行）。
 - 发现 EHRB 或验收阻断项：必须暂停并等待用户决策。

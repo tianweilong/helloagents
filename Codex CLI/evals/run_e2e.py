@@ -752,6 +752,52 @@ def _lint_no_bare_references(base: Path) -> List[CheckResult]:
     ]
 
 
+def _lint_skill_metadata_consistency(base: Path) -> List[CheckResult]:
+    """
+    SKILL.md 的 YAML frontmatter 与 SKILL.toml 的展示元数据需要保持一致，
+    避免触发/发现行为因“双源漂移”而变得不可预测。
+    """
+    results: List[CheckResult] = []
+
+    skill_md_path = base / "skills/helloagents/SKILL.md"
+    skill_toml_path = base / "skills/helloagents/SKILL.toml"
+    skill_md = _read_text(skill_md_path)
+    skill_toml = _read_text(skill_toml_path)
+
+    fm = ""
+    fm_match = re.match(r"^---\s*\n(.*?)\n---\s*\n", skill_md, re.DOTALL)
+    if fm_match:
+        fm = fm_match.group(1)
+
+    md_desc = ""
+    md_m = re.search(r"^description:\s*(.+?)\s*$", fm, re.MULTILINE)
+    if md_m:
+        md_desc = md_m.group(1).strip().strip('"').strip("'")
+
+    toml_desc = ""
+    toml_m = re.search(r'^short_description\s*=\s*"([^"]*)"\s*$', skill_toml, re.MULTILINE)
+    if toml_m:
+        toml_desc = toml_m.group(1).strip()
+
+    if not md_desc or not toml_desc:
+        missing = []
+        if not md_desc:
+            missing.append("SKILL.md:description")
+        if not toml_desc:
+            missing.append("SKILL.toml:short_description")
+        results.append(CheckResult("lint:skill-metadata:present", False, "缺少字段: " + ", ".join(missing)))
+        return results
+
+    results.append(
+        CheckResult(
+            "lint:skill-metadata:short_description_matches_frontmatter",
+            md_desc == toml_desc,
+            f"不一致：SKILL.md(description)={md_desc!r} vs SKILL.toml(short_description)={toml_desc!r}",
+        )
+    )
+    return results
+
+
 def _print_step(label: str) -> float:
     print(f"  - {label} ...", flush=True)
     return time.perf_counter()
@@ -778,6 +824,7 @@ def run_local_checks(*, base: Path, only: str, pattern: str) -> int:
 
     if only in ("lint", "local", "all"):
         checks.extend(_lint_no_bare_references(base))
+        checks.extend(_lint_skill_metadata_consistency(base))
 
     if only in ("docs", "local", "all"):
         checks.extend(_check_activate(base))

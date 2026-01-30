@@ -37,15 +37,15 @@
 1. 设置状态：`WORKFLOW_MODE=AUTO_PLAN`、`STAGE_ENTRY_MODE=NATURAL`
 2. 规范化需求（仅内部）：提炼目标/范围/约束；不输出长篇评分
 3. 直接创建方案包（必须用脚本，不要手写目录）：
-   - `python3 -X utf8 "skills/helloagents/scripts/create_package.py" "<feature>" --type implementation --path .`
+   - `python3 -X utf8 "{SKILL_ROOT}/scripts/create_package.py" "<feature>" --type implementation --path .`
 4. 填充方案包：
    - 优先使用预置模板（避免长文本手写导致超时/卡死）：
-     - 例如本用例可直接复制：`skills/helloagents/assets/presets/evals-lint-no-bare-references/{proposal.md,tasks.md}`
+     - 例如本用例可直接复制：`{SKILL_ROOT}/assets/presets/evals-lint-no-bare-references/{proposal.md,tasks.md}`
    - 若无预置模板：
      - `proposal.md`：只填“需求/目标/约束/验收标准/方案/影响范围/风险”，其余章节可删除或留空但不得保留花括号占位符
      - `tasks.md`：4-8 条可执行任务，每条都要有“验证命令/检查点”，且拆分粒度可验证
 5. 验证方案包（必须用脚本）：
-   - `python3 -X utf8 "skills/helloagents/scripts/validate_package.py" --path . "<package-name>"`
+   - `python3 -X utf8 "{SKILL_ROOT}/scripts/validate_package.py" --path . "<package-name>"`
 6. 输出（按 G3 完成场景）必须包含：
    - 方案包路径
    - 任务清单摘要：列出 tasks.md 的关键任务（≥4 条），每条至少包含“做什么 + 如何验证”
@@ -101,7 +101,7 @@
 ```yaml
 输入分支:
   用户未提供需求描述（例如仅输入 `~plan`）:
-    执行: 读取并执行 references/stages/evaluate.md（追问循环）
+    执行: 不读取任何文件/不运行任何命令；直接输出追问（≤5）+ 风险说明，并等待用户补充
     输出: 按 G3 场景内容规则（追问）输出并等待用户补充
 
   用户提供需求描述（`~plan <需求描述>`）:

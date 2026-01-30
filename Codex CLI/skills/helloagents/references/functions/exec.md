@@ -103,11 +103,11 @@
 
 验证失败: 按 G3 场景内容规则（错误）输出，流程终止
   - 必须列出缺失项（例如 proposal.md/tasks.md）
-  - 必须给出可修复提示（包含可复制命令），例如：
-    - 重新生成（推荐）：`~plan <需求>` 或 `python3 -X utf8 "skills/helloagents/scripts/create_package.py" "<feature>" --type implementation --path .`
+    - 必须给出可修复提示（包含可复制命令），例如：
+    - 重新生成（推荐）：`~plan <需求>` 或 `python3 -X utf8 "{SKILL_ROOT}/scripts/create_package.py" "<feature>" --type implementation --path .`
     - 修复现有包（适合只缺文件）：从 templates 写入再人工补全占位符
-      - `cp "skills/helloagents/assets/templates/plan/proposal.md" "helloagents/plan/<package>/proposal.md"`
-      - `cp "skills/helloagents/assets/templates/plan/tasks.md" "helloagents/plan/<package>/tasks.md"`
+      - `cp "{TEMPLATE_DIR}/plan/proposal.md" "helloagents/plan/<package>/proposal.md"`
+      - `cp "{TEMPLATE_DIR}/plan/tasks.md" "helloagents/plan/<package>/tasks.md"`
 ```
 
 ### 步骤3.5: 风险预检（EHRB）
