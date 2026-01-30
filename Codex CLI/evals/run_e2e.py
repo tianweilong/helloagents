@@ -21,6 +21,7 @@ import json
 import os
 import re
 import shutil
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -46,6 +47,56 @@ class CheckResult:
     name: str
     ok: bool
     detail: str = ""
+
+def _format_cmd(cmd: List[str]) -> str:
+    # For debug logging; avoid printing env.
+    return " ".join(shlex.quote(s) for s in cmd)
+
+
+def _trim_text(text: str, max_chars: int) -> str:
+    s = text.strip()
+    if max_chars > 0 and len(s) > max_chars:
+        return s[:max_chars] + "\n...(已截断)"
+    return s
+
+
+def _print_text_block(label: str, text: str, *, max_chars: int, indent: str = "    ") -> None:
+    print(f"  - ({label})", flush=True)
+    s = _trim_text(text, max_chars)
+    if not s:
+        print(f"{indent}(空)", flush=True)
+        return
+    for line in s.splitlines():
+        print(f"{indent}{line}", flush=True)
+
+
+def _print_commands_block(
+    commands: List[Dict[str, Any]],
+    *,
+    max_commands: int,
+    show_command_output: bool,
+    command_output_chars: int,
+) -> None:
+    print("  - (commands)", flush=True)
+    if not commands:
+        print("    (无)", flush=True)
+        return
+
+    for c in commands[:max_commands]:
+        cmd = str(c.get("command", "")).strip()
+        exit_code = c.get("exit_code", None)
+        prefix = f"[exit={exit_code}] " if exit_code is not None else ""
+        print(f"    {prefix}{cmd}".rstrip(), flush=True)
+
+        if show_command_output:
+            out = str(c.get("output", "") or "")
+            out_trimmed = _trim_text(out, command_output_chars)
+            if out_trimmed:
+                for line in out_trimmed.splitlines():
+                    print(f"      {line}", flush=True)
+
+    if len(commands) > max_commands:
+        print(f"    (已截断，共 {len(commands)} 条命令)", flush=True)
 
 
 def _base_dir() -> Path:
@@ -770,6 +821,17 @@ def main() -> int:
     parser.add_argument("--max-commands", type=int, default=50, help="传给 judge 的 commands 最大条数")
     parser.add_argument("--show-output-on-fail", action="store_true", help="当用例 FAIL 时打印 assistant_output（截断）")
     parser.add_argument("--show-commands-on-fail", action="store_true", help="当用例 FAIL 时打印 commands（截断）")
+    parser.add_argument("--show-io", action="store_true", help="打印每个用例调用 codex 的输入/输出（query/assistant_output/commands）")
+    parser.add_argument("--show-query", action="store_true", help="打印每个用例传给 codex 的 query（输入）")
+    parser.add_argument("--show-output", action="store_true", help="打印每个用例的 assistant_output（输出）")
+    parser.add_argument("--show-commands", action="store_true", help="打印每个用例的 commands（命令列表）")
+    parser.add_argument("--show-command-output", action="store_true", help="配合 --show-commands/--show-io：额外打印每条命令的 aggregated_output（可能很长）")
+    parser.add_argument("--show-codex-cmd", action="store_true", help="打印实际执行的 codex 命令行（便于复现）")
+    parser.add_argument("--show-stderr", action="store_true", help="打印 codex stderr（如有）")
+    parser.add_argument("--show-output-chars", type=int, default=4000, help="--show-output/--show-output-on-fail 的最大字符数")
+    parser.add_argument("--show-stderr-chars", type=int, default=4000, help="--show-stderr 的最大字符数")
+    parser.add_argument("--show-max-commands", type=int, default=20, help="--show-commands/--show-commands-on-fail 的最大命令条数")
+    parser.add_argument("--show-command-output-chars", type=int, default=2000, help="--show-command-output 时每条命令输出最大字符数")
     parser.add_argument("--sandbox", default="workspace-write", choices=["read-only", "workspace-write", "danger-full-access"], help="对话运行 sandbox")
     parser.add_argument(
         "--exec-mode",
@@ -787,6 +849,10 @@ def main() -> int:
 
     args.reasoning_effort = str(args.reasoning_effort).lower()
     args.judge_reasoning_effort = str(args.judge_reasoning_effort).lower() if args.judge_reasoning_effort is not None else None
+    if args.show_io:
+        args.show_query = True
+        args.show_output = True
+        args.show_commands = True
 
     base = _base_dir()
     schema_path = base / "evals/judge.schema.json"
@@ -850,6 +916,8 @@ def main() -> int:
             expected = data.get("expected_behavior", [])
             if not isinstance(expected, list):
                 expected = []
+            if args.show_query:
+                _print_text_block("codex_input(query)", query, max_chars=args.show_output_chars)
 
             step = _print_step("复制临时工作区（避免污染仓库）")
             try:
@@ -880,6 +948,21 @@ def main() -> int:
                 if setup_ok:
                     step = _print_step(f"运行对话（codex exec, sandbox={args.sandbox}）")
                     try:
+                        if args.show_codex_cmd:
+                            exec_cmd = _codex_cmd_prefix(
+                                args.model,
+                                args.sandbox,
+                                args.reasoning_effort,
+                                bypass_sandbox=(args.exec_mode == "bypass"),
+                            ) + [
+                                "exec",
+                                "--skip-git-repo-check",
+                                "--json",
+                                "-C",
+                                str(ws_dir),
+                                query,
+                            ]
+                            _print_text_block("codex_cmd(exec)", _format_cmd(exec_cmd), max_chars=0)
                         run = run_codex_exec(
                             prompt=query,
                             workdir=ws_dir,
@@ -906,6 +989,17 @@ def main() -> int:
                 print(f"FAIL {eval_path.name}")
                 print(f"  - __codex_exec__: {run_err}")
                 continue
+            if args.show_stderr and run.stderr.strip():
+                _print_text_block("codex_stderr(exec)", run.stderr, max_chars=args.show_stderr_chars)
+            if args.show_output:
+                _print_text_block("assistant_output", run.agent_message, max_chars=args.show_output_chars)
+            if args.show_commands:
+                _print_commands_block(
+                    run.commands,
+                    max_commands=args.show_max_commands,
+                    show_command_output=bool(args.show_command_output),
+                    command_output_chars=args.show_command_output_chars,
+                )
 
             step = _print_step("运行 judge（codex exec --output-schema）")
             judge_prompt = _build_judge_prompt(
@@ -919,6 +1013,23 @@ def main() -> int:
             judge_model = args.judge_model or args.model
             judge_effort = args.judge_reasoning_effort or args.reasoning_effort
             try:
+                if args.show_codex_cmd:
+                    judge_cmd = _codex_cmd_prefix(
+                        judge_model,
+                        "read-only",
+                        judge_effort,
+                        bypass_sandbox=False,
+                    ) + [
+                        "exec",
+                        "--skip-git-repo-check",
+                        "--json",
+                        "--output-schema",
+                        str(schema_path),
+                        "-C",
+                        str(judge_dir),
+                        f"<judge_prompt len={len(judge_prompt)} chars>",
+                    ]
+                    _print_text_block("codex_cmd(judge)", _format_cmd(judge_cmd), max_chars=0)
                 verdict = run_judge(
                     schema_path=schema_path,
                     judge_dir=judge_dir,
@@ -950,21 +1061,15 @@ def main() -> int:
                         reason = str(c.get("reason", ""))
                         if not p:
                             print(f"  - {item}: {reason}")
-                if args.show_commands_on_fail:
-                    print("  - (commands)")
-                    for c in run.commands[:20]:
-                        cmd = str(c.get("command", "")).strip()
-                        if cmd:
-                            print(f"    {cmd}")
-                    if len(run.commands) > 20:
-                        print(f"    (已截断，共 {len(run.commands)} 条命令)")
-                if args.show_output_on_fail:
-                    out = run.agent_message.strip()
-                    if len(out) > 2000:
-                        out = out[:2000] + "\n...(已截断)"
-                    print("  - (assistant_output)")
-                    for line in out.splitlines()[:80]:
-                        print(f"    {line}")
+                if args.show_commands_on_fail and not args.show_commands:
+                    _print_commands_block(
+                        run.commands,
+                        max_commands=args.show_max_commands,
+                        show_command_output=bool(args.show_command_output),
+                        command_output_chars=args.show_command_output_chars,
+                    )
+                if args.show_output_on_fail and not args.show_output:
+                    _print_text_block("assistant_output", run.agent_message, max_chars=args.show_output_chars)
 
         print(f"\nSUMMARY passed={passed} failed={failed} total={passed+failed}")
         return 0 if overall_ok and failed == 0 else 1

@@ -57,6 +57,9 @@ python3 -X utf8 evals/run_e2e.py --reasoning-effort medium
 python3 -X utf8 evals/run_e2e.py --timeout 240
 python3 -X utf8 evals/run_e2e.py --codex-home system
 python3 -X utf8 evals/run_e2e.py --exec-mode sandboxed
+python3 -X utf8 evals/run_e2e.py --show-io                 # 打印每个用例的 codex 输入/输出（query/assistant_output/commands）
+python3 -X utf8 evals/run_e2e.py --show-io --show-command-output  # 额外打印每条命令的 aggregated_output（更啰嗦）
+python3 -X utf8 evals/run_e2e.py --show-codex-cmd --show-stderr   # 打印实际 codex 命令行与 stderr（便于复现/排障）
 ```
 
 注意：
